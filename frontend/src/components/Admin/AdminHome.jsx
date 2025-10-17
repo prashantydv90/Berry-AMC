@@ -20,7 +20,7 @@
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const res = await axios.get("http://localhost:5555/api/getclientreqs");
+//         const res = await axios.get("https://berry-amc.onrender.com/api/getclientreqs");
 //         setClientReq(res.data.data || []);
 //       } catch (err) {
 //         console.error(err);
@@ -40,7 +40,7 @@
 //     const fetchClients = async () => {
 //       try {
 //         setLoading(true);
-//         const res = await axios.get("http://localhost:5555/api/getClientDetails");
+//         const res = await axios.get("https://berry-amc.onrender.com/api/getClientDetails");
 //         setClients(res.data.data || []);
 //       } catch (err) {
 //         setError(err.message || "Error fetching data");
@@ -169,7 +169,7 @@ export const AdminHome = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5555/api/getclientreqs",{withCredentials:true});
+        const res = await axios.get("https://berry-amc.onrender.com/api/getclientreqs",{withCredentials:true});
         setClientReq(res.data.data || []);
       } catch (err) {
         console.error(err);
@@ -183,7 +183,7 @@ export const AdminHome = () => {
     const fetchClients = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("http://localhost:5555/api/getClientDetails",{withCredentials:true});
+        const res = await axios.get("https://berry-amc.onrender.com/api/getClientDetails",{withCredentials:true});
         setClients(res.data.data || []);
       } catch (err) {
         setError(err.message || "Error fetching data");

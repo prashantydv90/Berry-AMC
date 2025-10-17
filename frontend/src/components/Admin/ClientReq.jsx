@@ -19,7 +19,7 @@ const ClientRequestsPage = () => {
 
   const fetchRequests = async () => {
     try {
-      const res = await axios.get("http://localhost:5555/api/getclientreqs",{withCredentials:true});
+      const res = await axios.get("https://berry-amc.onrender.com/api/getclientreqs",{withCredentials:true});
       setRequests(res.data.data || []);
     } catch (error) {
       console.error("Error fetching client requests:", error);
@@ -39,13 +39,13 @@ const ClientRequestsPage = () => {
   const confirmAction = async () => {
     try {
       if(actionType==='approve'){
-        await axios.post('http://localhost:5555/api/addClient',selectedReq,{withCredentials:true}).then((res)=>{
+        await axios.post('https://berry-amc.onrender.com/api/addClient',selectedReq,{withCredentials:true}).then((res)=>{
             console.log(res.data.message);
         }).catch((err)=>{
             console.log(err);
         })
       }
-      await axios.delete(`http://localhost:5555/api/deletereq/${selectedReq._id}`,{withCredentials:true})
+      await axios.delete(`https://berry-amc.onrender.com/api/deletereq/${selectedReq._id}`,{withCredentials:true})
       toast.success(
         actionType === "approve"
           ? "Client approved successfully!"

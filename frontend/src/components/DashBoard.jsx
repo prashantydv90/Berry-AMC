@@ -113,7 +113,7 @@ export const DashBoard = () => {
             try {
                 setLoading(true);
                 const res = await axios.get(
-                    `http://localhost:5555/api/getuserdetails/${user.userId}`
+                    `https://berry-amc.onrender.com/api/getuserdetails/${user.userId}`
                     , { withCredentials: true });
                 setUser(prev => ({
                     ...prev,
@@ -135,7 +135,7 @@ export const DashBoard = () => {
             try {
                 setLoading(true);
                 const res = await axios.get(
-                    `http://localhost:5555/api/get1ClientDetails/${user.clientId}`
+                    `https://berry-amc.onrender.com/api/get1ClientDetails/${user.clientId}`
                 );
                 setClient(res.data.data || null);
             } catch (err) {

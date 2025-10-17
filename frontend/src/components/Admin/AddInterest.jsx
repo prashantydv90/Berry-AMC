@@ -19,7 +19,7 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
   const handleSubmit =async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`http://localhost:5555/api/addinterest/${client._id}`, formData,{withCredentials:true});
+      const res = await axios.post(`https://berry-amc.onrender.com/api/addinterest/${client._id}`, formData,{withCredentials:true});
       alert(res.data.message);
       setFormData({ startMonth: "", endMonth: "", returns: "" });
       setInterestForm(false);

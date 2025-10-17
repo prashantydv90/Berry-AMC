@@ -30,7 +30,7 @@ export const ClientDetails = () => {
         const fetchClient = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${id}`, { withCredentials: true });
+                const res = await axios.get(`https://berry-amc.onrender.com/api/get1ClientDetails/${id}`, { withCredentials: true });
                 setClient(res.data.data || null);
                 console.log(res)
             } catch (err) {

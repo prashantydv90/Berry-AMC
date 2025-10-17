@@ -112,7 +112,7 @@
 
 //   const handleSignup = async () => {
 //     try {
-//       const res = await axios.post('http://localhost:5555/api/signup', form);
+//       const res = await axios.post('https://berry-amc.onrender.com/api/signup', form);
 //       if(res.data.success){
 //         setOtpSent(true);
 //         toast.success("Signup successful. OTP sent to your email/phone.");
@@ -124,7 +124,7 @@
 
 //   const handleVerifyOtp = async () => {
 //     try {
-//       const res = await axios.post('http://localhost:5555/api/signup/verify-otp', {
+//       const res = await axios.post('https://berry-amc.onrender.com/api/signup/verify-otp', {
 //         email: form.email,
 //         otp
 //       });
@@ -270,7 +270,7 @@ export const Signup = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5555/api/signup', form);
+      const res = await axios.post('https://berry-amc.onrender.com/api/signup', form);
       if (res.data.success) {
         setOtpSent(true);
         toast.success(res.data.message);
@@ -289,7 +289,7 @@ export const Signup = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5555/api/signup/verify-otp', {
+      const res = await axios.post('https://berry-amc.onrender.com/api/signup/verify-otp', {
         email: form.email,
         otp
       });
