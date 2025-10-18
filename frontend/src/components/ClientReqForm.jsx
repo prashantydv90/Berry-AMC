@@ -57,7 +57,7 @@ export const ClientRequestForm = ({ onClose }) => {
     <>
         <NavBar/>
         <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-      <div className="min-h-screen flex flex-col pt-20 bg-zinc-50 justify-center items-center">
+      <div className="min-h-screen flex flex-col md:pt-20 bg-zinc-50 justify-center items-center mb-10">
         <div className="bg-white sm:w-[30rem] w-[90%] rounded-xl shadow-lg p-6 relative">
           {/* Close Button */}
           {/* <button

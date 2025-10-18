@@ -184,7 +184,7 @@ export const DashBoard = () => {
         return (
             <>
                 <NavBar />
-                <div className="text-center h-screen flex flex-col items-center justify-center ">
+                <div className="text-center h-screen flex flex-col items-center justify-center px-6 ">
                     <h2 className="text-2xl font-semibold text-zinc-700 mb-2">
                         You are not logged in
                     </h2>
@@ -207,7 +207,7 @@ export const DashBoard = () => {
         return (
             <>
                 <NavBar />
-                <div className=" h-screen text-center flex flex-col items-center justify-center ">
+                <div className=" h-screen text-center flex flex-col items-center justify-center px-6">
                     <h2 className="text-2xl font-semibold text-zinc-700 mb-2">
                         You’re not registered as a client yet
                     </h2>
@@ -228,7 +228,7 @@ export const DashBoard = () => {
 
     if (!client) {
         return (
-            <div className="flex flex-col items-center justify-center h-screen bg-zinc-50">
+            <div className="flex flex-col items-center justify-center h-screen bg-zinc-50 px-6">
                 <NavBar />
                 <p className="text-zinc-500 font-medium">
                     No client data found for your account.
@@ -245,7 +245,7 @@ export const DashBoard = () => {
         return (
             <div className="">
                 <NavBar />
-                <div className="h-screen flex flex-col justify-center items-center text-center ">
+                <div className="h-screen flex flex-col justify-center items-center text-center px-6 ">
                     <h2 className="text-2xl font-semibold text-zinc-700 mb-2">
                         No investments yet
                     </h2>
