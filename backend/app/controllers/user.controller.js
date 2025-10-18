@@ -3,13 +3,15 @@ import { User } from "../models/user.model.js";
 import { Client } from "../models/client.model.js";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "../utils/sendEmail2.js";
+import { sendVerificationEmail } from "../utils/sendVerificationEmail.js";
 
 // Signup Controller
 export const signup = async (req, res) => {
   try {
     const { email, password, name } = req.body;
+
     if (!email || !password || !name) {
-      return res.status(401).json({
+      return res.status(400).json({
         message: "Something is missing, please check!",
         success: false,
       });
@@ -18,7 +20,7 @@ export const signup = async (req, res) => {
     const existingUser = await User.findOne({ email });
     const existingClient = await Client.findOne({ email });
 
-    // Case 1: User already exists and is verified
+    // ✅ Case 1: Already verified user
     if (existingUser && existingUser.isVerified) {
       return res.status(400).json({
         message: "Email already exists.",
@@ -27,120 +29,46 @@ export const signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    // Generate new OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Case 2: User exists but not verified → resend OTP and update password
+    // ✅ Case 2: User exists but not verified → resend OTP
     if (existingUser && !existingUser.isVerified) {
       existingUser.password = hashedPassword;
       existingUser.name = name;
       existingUser.otp = otp;
-      if (existingClient) existingUser.clientId = existingClient._id; // link client if exists
+      existingUser.otpExpires = Date.now() + 10 * 60 * 1000; // 10 min validity
+      if (existingClient) existingUser.clientId = existingClient._id;
       await existingUser.save();
 
-      transporter.sendMail({
-        from: `"Berry AMC" <${process.env.EMAIL_FROM}>`,
-        to: email,
-        subject: "🔐 Verify Your Email - One Time Password (OTP)",
-        html: `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; padding: 30px;">
-      <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px;">
-        <h2 style="text-align: center; color: #4F46E5;">Berry AMC</h2>
-        <hr style="border: none; height: 2px; background: #4F46E5; width: 60px; margin: 10px auto 25px;" />
-        <p style="font-size: 16px; color: #333;">
-          Hi <b>${existingUser.name}</b>,
-        </p>
-        <p style="font-size: 15px; color: #333; line-height: 1.6;">
-          Thank you for signing up with <b>Berry AMC</b>!  
-          To complete your registration, please verify your email address using the One Time Password (OTP) below:
-        </p>
-
-        <div style="text-align: center; margin: 30px 0;">
-          <span style="display: inline-block; background: #4F46E5; color: #fff; padding: 15px 40px; border-radius: 8px; font-size: 22px; letter-spacing: 3px; font-weight: bold;">
-            ${otp}
-          </span>
-        </div>
-
-        <p style="font-size: 14px; color: #555; line-height: 1.6;">
-          This OTP is valid for <b>10 minutes</b>. Please do not share it with anyone.
-          If you did not request this verification, you can safely ignore this email.
-        </p>
-
-        <p style="font-size: 14px; color: #777; margin-top: 25px;">
-          Best regards,<br />
-          <b>Berry AMC Team</b><br />
-          <a href="https://berryamc.in" style="color: #4F46E5; text-decoration: none;">www.myapp.com</a>
-        </p>
-      </div>
-    </div>
-  `,
-      });
-
+      await sendVerificationEmail(existingUser.name, email, otp);
       return res.status(200).json({
-        message: "Account created. Please verify OTP.",
+        message: "Account updated. Please verify your email using OTP.",
         success: true,
       });
     }
 
-    // Case 3: New user → create record
-    const user = await User.create({
+    // ✅ Case 3: New user
+    const newUser = await User.create({
       email,
-      password:hashedPassword,
+      password: hashedPassword,
       name,
-      clubId: null,
       otp,
       isVerified: false,
+      otpExpires: Date.now() + 10 * 60 * 1000,
       clientId: existingClient ? existingClient._id : null,
     });
 
-    transporter.sendMail({
-      from: `"Berry AMC" <${process.env.EMAIL_FROM}>`,
-      to: email,
-      subject: "🔐 Verify Your Email - One Time Password (OTP)",
-      html: `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; padding: 30px;">
-      <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px;">
-        <h2 style="text-align: center; color: #4F46E5;">Berry AMC</h2>
-        <hr style="border: none; height: 2px; background: #4F46E5; width: 60px; margin: 10px auto 25px;" />
-        <p style="font-size: 16px; color: #333;">
-          Hi <b>${user.name}</b>,
-        </p>
-        <p style="font-size: 15px; color: #333; line-height: 1.6;">
-          Thank you for signing up with <b>Berry AMC</b>!  
-          To complete your registration, please verify your email address using the One Time Password (OTP) below:
-        </p>
-
-        <div style="text-align: center; margin: 30px 0;">
-          <span style="display: inline-block; background: #4F46E5; color: #fff; padding: 15px 40px; border-radius: 8px; font-size: 22px; letter-spacing: 3px; font-weight: bold;">
-            ${otp}
-          </span>
-        </div>
-
-        <p style="font-size: 14px; color: #555; line-height: 1.6;">
-          This OTP is valid for <b>10 minutes</b>. Please do not share it with anyone.
-          If you did not request this verification, you can safely ignore this email.
-        </p>
-
-        <p style="font-size: 14px; color: #777; margin-top: 25px;">
-          Best regards,<br />
-          <b>Berry AMC Team</b><br />
-          <a href="https://berryamc.in" style="color: #4F46E5; text-decoration: none;">www.myapp.com</a>
-        </p>
-      </div>
-    </div>
-  `,
-    });
+    await sendVerificationEmail(newUser.name, email, otp);
 
     return res.status(201).json({
       message: "Account created. Please verify OTP.",
       success: true,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Server error" });
+    console.error("Signup error:", error);
+    return res.status(500).json({ message: "Server error", success: false });
   }
 };
-
 
 
 

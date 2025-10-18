@@ -1,11 +1,9 @@
-
 import { Client } from "../models/client.model.js";
 import { FDInvestment } from "../models/fdInvestment.model.js";
 import { MFInvestment } from "../models/mfInvestment.model.js";
 import { User } from "../models/user.model.js";
 import { clientApprovalEmail } from "../utils/emailTemplate.js";
-import { transporter } from "../utils/sendEmail.js";
-
+import { sendMail, transporter } from "../utils/sendEmail.js";
 
 // Add Client
 export const addClient = async (req, res) => {
@@ -43,11 +41,11 @@ export const addClient = async (req, res) => {
     const { subject, html } = clientApprovalEmail(client.name);
 
     // Send email
-    transporter.sendMail({
-      from: `"Berry AMC Support" <${process.env.EMAIL_FROM}>`,
+    await sendMail({
       to: client.email,
       subject,
       html,
+      from: "Berry AMC Support <no-reply@berryamc.com>",
     });
 
     const user = await User.findOne({ email });
@@ -108,7 +106,6 @@ export const get1ClientDetails = async (req, res) => {
         path: "MFPeriodicInterest",
         options: { sort: { createdAt: -1 } }, // newest first
       });
-
 
     if (!client) {
       return res.status(404).json({
