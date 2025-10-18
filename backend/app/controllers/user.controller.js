@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
-import { transporter } from "../utils/sendEmail.js";
+import { sendMail, transporter } from "../utils/sendEmail.js";
 import { Client } from "../models/client.model.js";
 import bcrypt from "bcryptjs";
 
@@ -292,22 +292,49 @@ export const forgotPassword = async (req, res) => {
     await user.save();
 
     // Send email
-    await transporter.sendMail({
-      from: `"Berry AMC" <${process.env.EMAIL_FROM}>`,
-      to: email,
-      subject: "🔐 Reset Your Password - Berry AMC",
-      html: `
-        <div style="font-family:Arial;padding:20px;background:#f8f9fa">
-          <h2 style="color:#4F46E5">Berry AMC Password Reset</h2>
-          <p>Hello <b>${user.name}</b>,</p>
-          <p>Use the OTP below to reset your password:</p>
-          <h3 style="text-align:center; background:#4F46E5;color:white;padding:10px;border-radius:8px;">${otp}</h3>
-          <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
-          <br/>
-          <p>Best regards,<br/>Berry AMC Team</p>
-        </div>
-      `,
-    });
+    // await transporter.sendMail({
+    //   from: `"Berry AMC" <${process.env.EMAIL_FROM}>`,
+    //   to: email,
+    //   subject: "🔐 Reset Your Password - Berry AMC",
+    //   html: `
+    //     <div style="font-family:Arial;padding:20px;background:#f8f9fa">
+    //       <h2 style="color:#4F46E5">Berry AMC Password Reset</h2>
+    //       <p>Hello <b>${user.name}</b>,</p>
+    //       <p>Use the OTP below to reset your password:</p>
+    //       <h3 style="text-align:center; background:#4F46E5;color:white;padding:10px;border-radius:8px;">${otp}</h3>
+    //       <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
+    //       <br/>
+    //       <p>Best regards,<br/>Berry AMC Team</p>
+    //     </div>
+    //   `,
+    // });
+
+const htmlContent = `
+<div style="font-family:Arial;padding:20px;background:#f8f9fa">
+  <h2 style="color:#4F46E5">Berry AMC Password Reset</h2>
+  <p>Hello <b>${user.name}</b>,</p>
+  <p>Use the OTP below to reset your password:</p>
+  <h3 style="text-align:center; background:#4F46E5;color:white;padding:10px;border-radius:8px;">${otp}</h3>
+  <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
+  <br/>
+  <p>Best regards,<br/>Berry AMC Team</p>
+</div>
+`;
+
+try {
+  const info = await sendMail({
+    to: email,
+    subject: "🔐 Reset Your Password - Berry AMC",
+    html: htmlContent,
+  });
+  console.log("Email sent successfully:", info.response);
+} catch (err) {
+  console.error("Failed to send email:", err);
+}
+
+
+
+
 
     res.json({ message: "OTP sent to your email", success: true });
   } catch (error) {

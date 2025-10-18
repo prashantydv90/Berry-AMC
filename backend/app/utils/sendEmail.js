@@ -25,16 +25,39 @@ dotenv.config();
 // });
 
 export const transporter = nodemailer.createTransport({
-  host:"smtp.gmail.com",
-  port:587,
-  secure:false,
-  requireTLS:true,
-  logger:true,
-  debug:true,
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  logger: true,
+  debug: true,
   auth: {
-    user: process.env.EMAIL_USER, // your email
-    pass: process.env.EMAIL_PASS, // your app password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
+
+// Send mail as a Promise
+export const sendMail = ({ to, subject, html }) => {
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(
+      {
+        from: `"Berry AMC" <${process.env.EMAIL_FROM}>`,
+        to,
+        subject,
+        html,
+      },
+      (err, info) => {
+        if (err) {
+          console.error("Error sending email:", err);
+          reject(err);
+        } else {
+          console.log("Email sent:", info.response);
+          resolve(info);
+        }
+      }
+    );
+  });
+};
 
 
