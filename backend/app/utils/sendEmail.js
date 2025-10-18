@@ -11,17 +11,30 @@ dotenv.config();
 //   },
 // });
 
+// export const transporter = nodemailer.createTransport({
+//   host: "smtp.sendgrid.net",
+//   port: 587,         // TLS port
+//   secure: false,     // true for port 465 (SSL)
+//   auth: {
+//     user: "apikey",               // literally "apikey"
+//     pass: process.env.SENDGRID_API_KEY, // your SendGrid API key
+//   },
+//   connectionTimeout: 10000,
+//   greetingTimeout: 10000,
+//   socketTimeout: 10000,
+// });
+
 export const transporter = nodemailer.createTransport({
-  host: "smtp.sendgrid.net",
-  port: 587,         // TLS port
-  secure: false,     // true for port 465 (SSL)
+  host:"smtp.gmail.com",
+  port:587,
+  secure:false,
+  requireTLS:true,
+  logger:true,
+  debug:true,
   auth: {
-    user: "apikey",               // literally "apikey"
-    pass: process.env.SENDGRID_API_KEY, // your SendGrid API key
+    user: process.env.EMAIL_USER, // your email
+    pass: process.env.EMAIL_PASS, // your app password
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
 });
 
 
