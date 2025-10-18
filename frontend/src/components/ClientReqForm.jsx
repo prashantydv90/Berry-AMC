@@ -21,7 +21,6 @@ export const ClientRequestForm = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false); // ✅ Success popup state
 
-  console.log(user)
   useEffect(() => {
     if (user) {
       setFormData((prev) => ({

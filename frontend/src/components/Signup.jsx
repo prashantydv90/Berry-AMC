@@ -57,7 +57,6 @@ export const Signup = () => {
         otp
       });
       if (res.data) {
-        console.log(res.data);
         toast.success(res.data.message);
          setTimeout(() => navigate("/user/login"), 500);
       }

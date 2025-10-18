@@ -1,67 +1,3 @@
-// import {  Menu, X } from 'lucide-react';
-// import React, { useState } from 'react'
-// import { Link, useNavigate } from 'react-router-dom';
-// import { ToastContainer } from 'react-toastify';
-
-// export const NavBar = () => {
-// const [menuOpen, setMenuOpen] = useState(false);
-// const navigate=useNavigate();
-//   return (
-//     <header className="fixed flex justify-between items-center z-50 px-6 md:px-12 py-4 shadow-md bg-white w-screen  ">
-//         {/* Logo */}
-//         <div className="text-2xl font-bold flex">
-//           {/* <span><img className="h-[50px]" src={logo} alt="" /></span> */}
-//           <span className="text-blue-600 ">BERRY</span> 
-//           AMC
-//         </div>
-
-//         {/* Desktop Nav */}
-//         <nav className="hidden md:flex gap-8 text-gray-600 font-medium">
-         
-//           <Link to="/" className="hover:text-blue-600">Home</Link>
-//           <Link to="/services" className="hover:text-blue-600">Our Services</Link>
-//           <Link to="/user-dashboard" className="hover:text-blue-600">Dashboard</Link>
-//           <Link to="/contact-us" className="hover:text-blue-600">Contact Us</Link>
-//         </nav>
-
-//         {/* Sign In button */}
-//         <div className="hidden md:block">
-//           <button className="bg-blue-600 text-white px-5 py-2 rounded-md font-medium hover:bg-blue-700"
-//           onClick={()=>navigate('/user/signup')}>
-//             Sign In
-//           </button>
-//         </div>
-
-//         {/* Mobile Menu Button */}
-//         <button
-//           className="md:hidden text-gray-700"
-//           onClick={() => setMenuOpen(!menuOpen)}
-//         >
-//           {menuOpen ? <X size={28} /> : <Menu size={28} />}
-//         </button>
-
-//         {/* Mobile Dropdown */}
-//         {menuOpen && (
-//           <div className="absolute top-full left-0 w-full bg-white shadow-md flex flex-col items-center py-4 md:hidden z-50">
-//             {/* <a href="#" className="py-2 text-gray-700 hover:text-blue-600">Home</a>
-//             <a href="#" className="py-2 text-gray-700 hover:text-blue-600">Our Services</a>
-//             <a href="#" className="py-2 text-gray-700 hover:text-blue-600">Portfolio</a>
-//             <a href="#" className="py-2 text-gray-700 hover:text-blue-600">Contact</a> */}
-//             <Link to="/" className="hover:text-blue-600 py-2 text-gray-700">Home</Link>
-//             <Link to="/services" className="hover:text-blue-600 py-2 text-gray-700">Our Services</Link>
-//             <Link to="/user-dashboard" className="hover:text-blue-600 py-2 text-gray-700">Dashboard</Link>
-//             <Link to="/contact-us" className="hover:text-blue-600 py-2 text-gray-700">Contact Us</Link>
-//             <button className="mt-3 bg-blue-600 text-white px-5 py-2 rounded-md font-medium hover:bg-blue-700"
-//                onClick={()=>navigate('/user/signup')}>
-//               Sign In
-//             </button>
-//           </div>
-//         )}
-//       </header>
-//   )
-// }
-
-
 
 
 
@@ -81,7 +17,6 @@ export const NavBar = () => {
   // Check if user is logged in (example: stored in localStorage)
   
   const {user,setUser}=useUser();
-  console.log(user);
   const handleLogout = () => {
     axios.get('https://berry-amc.onrender.com/api/logout',{withCredentials:true}).then((res)=>{
         console.log(res);

@@ -30,7 +30,6 @@ export const Analyse = ({ setOpenAnalyse, selected, client }) => {
         const projected = getProjectedReturns(finalValue, Cagr, startM, startYear, 15);
         setProjectedReturn(projected);
 
-        console.log("Projected Returns:", projected);
     }, [client]);
 
     return (

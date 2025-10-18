@@ -106,7 +106,6 @@ export const DashBoard = () => {
 
     const [totalReturn, setTotalReturn] = useState("");
     const [totalReturnPercent, setTotalReturnPercent] = useState("");
-    console.log(user);
     useEffect(() => {
         const fetchUser = async () => {
             if (!user) return;

@@ -16,7 +16,6 @@ export const OrderForm = ({ setOpenForm }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("New Order:", formData);
     // TODO: send to backend
     setOpenForm(false);
   };

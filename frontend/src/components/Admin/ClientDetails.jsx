@@ -32,7 +32,6 @@ export const ClientDetails = () => {
                 setLoading(true);
                 const res = await axios.get(`https://berry-amc.onrender.com/api/get1ClientDetails/${id}`, { withCredentials: true });
                 setClient(res.data.data || null);
-                console.log(res)
             } catch (err) {
                 setError(err.message || "Error fetching client");
             } finally {
