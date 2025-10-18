@@ -59,7 +59,7 @@ export const AddClientForm = ({ setShowClient }) => {
                     ))}
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700"
+                        className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 cursor-not-allowed"
                     >
                         Add Client
                     </button>

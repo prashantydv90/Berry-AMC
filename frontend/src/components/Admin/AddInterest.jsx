@@ -2,12 +2,13 @@ import axios from "axios";
 import React, { useState } from "react";
 
 export const AddInterestForm = ({ setInterestForm, client }) => {
-  const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState({
     startMonth: "",
     endMonth: "",
     returns: "",
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -16,15 +17,22 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
     });
   };
 
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const res = await axios.post(`https://berry-amc.onrender.com/api/addinterest/${client._id}`, formData,{withCredentials:true});
+      const res = await axios.post(
+        `https://berry-amc.onrender.com/api/addinterest/${client._id}`,
+        formData,
+        { withCredentials: true }
+      );
       alert(res.data.message);
       setFormData({ startMonth: "", endMonth: "", returns: "" });
       setInterestForm(false);
     } catch (error) {
       alert(error.response?.data?.message || "Error adding returns");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -33,7 +41,7 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
       <div className="relative h-[24rem] w-[34rem] bg-white shadow-lg rounded-xl p-6">
         {/* Close Button */}
         <button
-          onClick={()=>setInterestForm(false)}
+          onClick={() => setInterestForm(false)}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-3xl font-bold"
         >
           &times;
@@ -68,9 +76,11 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
             />
           </div>
 
-          {/* returns */}
+          {/* Returns */}
           <div>
-            <label className="block text-sm font-medium">Returns (in amount)</label>
+            <label className="block text-sm font-medium">
+              Returns (in amount)
+            </label>
             <input
               type="number"
               name="returns"
@@ -81,11 +91,17 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
             />
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-purple-600 text-white font-semibold py-2 rounded-lg hover:bg-purple-700"
+            disabled={isLoading}
+            className={`w-full font-semibold py-2 rounded-lg transition-colors ${
+              isLoading
+                ? "bg-purple-400 cursor-not-allowed text-white"
+                : "bg-purple-600 hover:bg-purple-700 text-white"
+            }`}
           >
-            Add Interest
+            {isLoading ? "Adding Interest..." : "Add Interest"}
           </button>
         </form>
       </div>

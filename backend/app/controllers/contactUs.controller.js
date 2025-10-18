@@ -13,7 +13,7 @@ export const sendContactEmail = async (req, res) => {
     const { subject, html } = contactEmail({ name, email, phone, message });
 
     await sendEmail({
-      to: "prashantpky90@gmail.com",
+      to: "support@berryamc.in",
       subject,
       html,
       from: `"${name}" <no-reply@berryamc.com>`,

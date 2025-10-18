@@ -42,13 +42,13 @@ const Footer = () => {
         <div>
           <h2 className="text-xl font-semibold text-white mb-4">Contact Us</h2>
           <p className="text-sm">📍 IIT Jammu, India</p>
-          <p className="text-sm">📞 +91 9693060665</p>
+          <p className="text-sm">📞 +91 9471433780</p>
           <p className="text-sm">✉️ support@berryamc.in</p>
 
           {/* Social Links */}
           <div className="flex space-x-4 mt-4">
             <a 
-              href="https://www.linkedin.com" 
+              href="https://www.linkedin.com/company/berry-amc/?viewAsMember=true" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="text-gray-400 hover:text-white text-2xl"

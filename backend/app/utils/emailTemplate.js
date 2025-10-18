@@ -24,7 +24,7 @@ export const clientApprovalEmail = (clientName) => {
           </p>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://berryamc.in/dashboard" style="background: #6D28D9; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+            <a href="https://berryamc.in/user-dashboard" style="background: #6D28D9; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold;">
               Go to your Dashboard
             </a>
           </div>

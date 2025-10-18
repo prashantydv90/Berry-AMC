@@ -19,7 +19,7 @@ const ClientRequestsPage = () => {
 
   const fetchRequests = async () => {
     try {
-      const res = await axios.get("https://berry-amc.onrender.com/api/getclientreqs",{withCredentials:true});
+      const res = await axios.get("https://berry-amc.onrender.com/api/getclientreqs", { withCredentials: true });
       setRequests(res.data.data || []);
     } catch (error) {
       console.error("Error fetching client requests:", error);
@@ -36,124 +36,139 @@ const ClientRequestsPage = () => {
   };
 
   // Confirm action
+  const [processing, setProcessing] = useState(false);
+
   const confirmAction = async () => {
+    setProcessing(true);
     try {
-      if(actionType==='approve'){
-        await axios.post('https://berry-amc.onrender.com/api/addClient',selectedReq,{withCredentials:true}).then((res)=>{
-            console.log(res.data.message);
-        }).catch((err)=>{
-            console.log(err);
-        })
+      if (actionType === "approve") {
+        const res = await axios.post(
+          "https://berry-amc.onrender.com/api/addClient",
+          selectedReq,
+          { withCredentials: true }
+        );
+        toast.success(res.data.message || "Client approved successfully!");
+      } else if (actionType === "reject") {
+        toast.info("Client request rejected!");
       }
-      await axios.delete(`https://berry-amc.onrender.com/api/deletereq/${selectedReq._id}`,{withCredentials:true})
-      toast.success(
-        actionType === "approve"
-          ? "Client approved successfully!"
-          : "Client request rejected!"
+
+      await axios.delete(
+        `https://berry-amc.onrender.com/api/deletereq/${selectedReq._id}`,
+        { withCredentials: true }
       );
 
-      // Refresh list
-      fetchRequests();
+      await fetchRequests();
     } catch (error) {
-      alert("Something went wrong. Try again!");
+      console.error(error);
+      toast.error("Something went wrong. Please try again!");
     } finally {
+      setProcessing(false);
       setShowConfirm(false);
       setSelectedReq(null);
       setActionType("");
     }
   };
 
+
   return (
     <>
-    <NavBar/>
-    <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-    <div className="min-h-screen bg-gray-50 pt-25 pb-10 px-6">
-      <h2 className="text-2xl font-bold text-center mb-6">
-        Client Requests
-      </h2>
+      <NavBar />
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+      <div className="min-h-screen bg-gray-50 pt-25 pb-10 px-6">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Client Requests
+        </h2>
 
-      {loading ? (
-        <p className="text-center">Loading requests...</p>
-      ) : requests.length === 0 ? (
-        <p className="text-center text-gray-500">No pending requests</p>
-      ) : (
-        <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-blue-600 text-white text-left">
-                <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-4">Email</th>
-                <th className="py-3 px-4">Phone</th>
-                <th className="py-3 px-4">PAN</th>
-                <th className="py-3 px-4 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((req) => (
-                <tr
-                  key={req._id}
-                  className="border-b hover:bg-gray-50 transition"
-                >
-                  <td className="py-3 px-4">{req.name}</td>
-                  <td className="py-3 px-4">{req.email}</td>
-                  <td className="py-3 px-4">{req.phone}</td>
-                  <td className="py-3 px-4">{req.PAN}</td>
-                  <td className="py-3 px-4 flex justify-center gap-3">
-                    <button
-                      className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200"
-                      onClick={() => handleActionClick(req, "approve")}
-                    >
-                      <Check size={18} />
-                    </button>
-                    <button
-                      className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200"
-                      onClick={() => handleActionClick(req, "reject")}
-                    >
-                      <X size={18} />
-                    </button>
-                  </td>
+        {loading ? (
+          <p className="text-center">Loading requests...</p>
+        ) : requests.length === 0 ? (
+          <p className="text-center text-gray-500">No pending requests</p>
+        ) : (
+          <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-blue-600 text-white text-left">
+                  <th className="py-3 px-4">Name</th>
+                  <th className="py-3 px-4">Email</th>
+                  <th className="py-3 px-4">Phone</th>
+                  <th className="py-3 px-4">PAN</th>
+                  <th className="py-3 px-4 text-center">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {requests.map((req) => (
+                  <tr
+                    key={req._id}
+                    className="border-b hover:bg-gray-50 transition"
+                  >
+                    <td className="py-3 px-4">{req.name}</td>
+                    <td className="py-3 px-4">{req.email}</td>
+                    <td className="py-3 px-4">{req.phone}</td>
+                    <td className="py-3 px-4">{req.PAN}</td>
+                    <td className="py-3 px-4 flex justify-center gap-3">
+                      <button
+                        className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200"
+                        onClick={() => handleActionClick(req, "approve")}
+                      >
+                        <Check size={18} />
+                      </button>
+                      <button
+                        className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200"
+                        onClick={() => handleActionClick(req, "reject")}
+                      >
+                        <X size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-      {/* Confirmation Popup */}
-      {showConfirm && selectedReq && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-[22rem]">
-            <h3 className="text-lg font-semibold mb-4">
-              {actionType === "approve"
-                ? "Approve this client request?"
-                : "Reject this client request?"}
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              {selectedReq.name} ({selectedReq.email})
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
-                onClick={() => setShowConfirm(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className={`px-4 py-2 rounded-md text-white ${
-                  actionType === "approve"
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
-                onClick={confirmAction}
-              >
-                {actionType === "approve" ? "Approve" : "Reject"}
-              </button>
+        {/* Confirmation Popup */}
+        {showConfirm && selectedReq && (
+          <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-[22rem]">
+              <h3 className="text-lg font-semibold mb-4">
+                {actionType === "approve"
+                  ? "Approve this client request?"
+                  : "Reject this client request?"}
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                {selectedReq.name} ({selectedReq.email})
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+                  onClick={() => setShowConfirm(false)}
+                  disabled={processing}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={`px-4 py-2 rounded-md text-white disabled:opacity-50 ${actionType === "approve"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
+                    }`}
+                  onClick={confirmAction}
+                  disabled={processing}
+                >
+                  {processing
+                    ? actionType === "approve"
+                      ? "Approving..."
+                      : "Rejecting..."
+                    : actionType === "approve"
+                      ? "Approve"
+                      : "Reject"}
+                </button>
+              </div>
+
             </div>
           </div>
-        </div>
-      )}
-    </div>
-    <Footer/>
+        )}
+      </div>
+      <Footer />
     </>
   );
 };

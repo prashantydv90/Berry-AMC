@@ -10,6 +10,7 @@ export const ResetPassword = () => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const email = location.state?.email || "";
 
   const handleResetPassword = async () => {
@@ -17,16 +18,22 @@ export const ResetPassword = () => {
       toast.warning("Please enter all fields");
       return;
     }
+
+    setIsLoading(true);
+
     try {
       const res = await axios.post("https://berry-amc.onrender.com/api/reset-password", {
         email,
         otp,
         newPassword,
       });
+
       toast.success(res.data.message);
       setTimeout(() => navigate("/user/login"), 1000);
     } catch (err) {
       toast.error(err.response?.data?.message || "Reset failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -55,9 +62,12 @@ export const ResetPassword = () => {
           />
           <button
             onClick={handleResetPassword}
-            className="w-full bg-violet-600 hover:bg-violet-700 text-white py-2 rounded font-semibold"
+            disabled={isLoading}
+            className={`w-full py-2 rounded font-semibold text-white transition-colors ${
+              isLoading ? "bg-violet-400 cursor-not-allowed" : "bg-violet-600 hover:bg-violet-700"
+            }`}
           >
-            Reset Password
+            {isLoading ? "Resetting..." : "Reset Password"}
           </button>
         </div>
       </div>
