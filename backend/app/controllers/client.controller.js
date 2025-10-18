@@ -3,7 +3,8 @@ import { FDInvestment } from "../models/fdInvestment.model.js";
 import { MFInvestment } from "../models/mfInvestment.model.js";
 import { User } from "../models/user.model.js";
 import { clientApprovalEmail } from "../utils/emailTemplate.js";
-import { sendMail, transporter } from "../utils/sendEmail.js";
+import {   transporter } from "../utils/sendEmail.js";
+import { sendEmail } from "../utils/sendEmail2.js";
 
 // Add Client
 export const addClient = async (req, res) => {
@@ -41,7 +42,7 @@ export const addClient = async (req, res) => {
     const { subject, html } = clientApprovalEmail(client.name);
 
     // Send email
-    await sendMail({
+    await sendEmail({
       to: client.email,
       subject,
       html,

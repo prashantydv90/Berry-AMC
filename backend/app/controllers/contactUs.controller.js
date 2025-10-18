@@ -1,5 +1,6 @@
 import { contactEmail } from "../utils/emailTemplate.js";
-import { sendMail } from "../utils/sendEmail.js";
+import { sendEmail } from "../utils/sendEmail2.js";
+
 
 
 export const sendContactEmail = async (req, res) => {
@@ -11,7 +12,7 @@ export const sendContactEmail = async (req, res) => {
 
     const { subject, html } = contactEmail({ name, email, phone, message });
 
-    await sendMail({
+    await sendEmail({
       to: "prashantpky90@gmail.com",
       subject,
       html,

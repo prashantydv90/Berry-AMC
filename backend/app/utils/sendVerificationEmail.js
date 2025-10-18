@@ -1,3 +1,5 @@
+import { sendEmail } from "./sendEmail2.js";
+
 export const sendVerificationEmail = async (name, email, otp) => {
   const html = `
     <div style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#f4f4f4;padding:30px;">
