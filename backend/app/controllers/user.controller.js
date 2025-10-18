@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
-import { sendMail, transporter } from "../utils/sendEmail.js";
 import { Client } from "../models/client.model.js";
 import bcrypt from "bcryptjs";
+import { sendEmail } from "../utils/sendEmail2.js";
 
 // Signup Controller
 export const signup = async (req, res) => {
@@ -276,72 +276,74 @@ export const getUser=async(req,res)=>{
 
 
 
+
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email)
-      return res.status(400).json({ message: "Email is required", success: false });
+      return res
+        .status(400)
+        .json({ message: "Email is required", success: false });
 
     const user = await User.findOne({ email });
     if (!user)
-      return res.status(404).json({ message: "User not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
 
-    // Generate OTP
+    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 mins
     await user.save();
 
-    // Send email
-    // await transporter.sendMail({
-    //   from: `"Berry AMC" <${process.env.EMAIL_FROM}>`,
-    //   to: email,
-    //   subject: "🔐 Reset Your Password - Berry AMC",
-    //   html: `
-    //     <div style="font-family:Arial;padding:20px;background:#f8f9fa">
-    //       <h2 style="color:#4F46E5">Berry AMC Password Reset</h2>
-    //       <p>Hello <b>${user.name}</b>,</p>
-    //       <p>Use the OTP below to reset your password:</p>
-    //       <h3 style="text-align:center; background:#4F46E5;color:white;padding:10px;border-radius:8px;">${otp}</h3>
-    //       <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
-    //       <br/>
-    //       <p>Best regards,<br/>Berry AMC Team</p>
-    //     </div>
-    //   `,
-    // });
+    // Prepare HTML content
+    const htmlContent = `
+      <div style="font-family:Arial,sans-serif;padding:20px;background:#f8f9fa">
+        <div style="max-width:600px;margin:auto;background:#fff;padding:30px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+          <h2 style="color:#4F46E5;text-align:center;margin-bottom:20px">Berry AMC Password Reset</h2>
+          <p>Hello <strong>${user.name}</strong>,</p>
+          <p>We received a request to reset your password. Use the OTP below:</p>
+          <div style="text-align:center;margin:30px 0;">
+            <span style="
+              display:inline-block;
+              font-size:24px;
+              letter-spacing:4px;
+              background-color:#4F46E5;
+              color:#fff;
+              padding:15px 25px;
+              border-radius:8px;
+              font-weight:bold;
+            ">${otp}</span>
+          </div>
+          <p style="color:#555">This OTP is valid for 10 minutes. Do not share it with anyone.</p>
+          <p>Best regards,<br/>Berry AMC Team</p>
+        </div>
+      </div>
+    `;
 
-const htmlContent = `
-<div style="font-family:Arial;padding:20px;background:#f8f9fa">
-  <h2 style="color:#4F46E5">Berry AMC Password Reset</h2>
-  <p>Hello <b>${user.name}</b>,</p>
-  <p>Use the OTP below to reset your password:</p>
-  <h3 style="text-align:center; background:#4F46E5;color:white;padding:10px;border-radius:8px;">${otp}</h3>
-  <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
-  <br/>
-  <p>Best regards,<br/>Berry AMC Team</p>
-</div>
-`;
-
-try {
-  const info = await sendMail({
-    to: email,
-    subject: "🔐 Reset Your Password - Berry AMC",
-    html: htmlContent,
-  });
-  console.log("Email sent successfully:", info.response);
-} catch (err) {
-  console.error("Failed to send email:", err);
-}
-
-
-
-
+    // Send email via Web API
+    try {
+      await sendEmail({
+        to: email,
+        subject: "🔐 Reset Your Password - Berry AMC",
+        html: htmlContent,
+      });
+      console.log("OTP email sent successfully to", email);
+    } catch (err) {
+      console.error("Failed to send OTP email:", err);
+      return res
+        .status(500)
+        .json({ message: "Failed to send OTP email", success: false });
+    }
 
     res.json({ message: "OTP sent to your email", success: true });
   } catch (error) {
-    console.error(error);
+    console.error("Forgot password error:", error);
     res.status(500).json({ message: "Server error", success: false });
   }
 };
+
 
 
 
