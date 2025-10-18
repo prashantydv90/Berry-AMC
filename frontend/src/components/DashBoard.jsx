@@ -296,7 +296,7 @@ export const DashBoard = () => {
 
                 {(selected === "fd" && (!client?.FDInvestments || client.FDInvestments.length === 0)) ||
                     (selected === "mf" && (!client?.MFInvestments || client.MFInvestments.length === 0)) ? (
-                    <div className="flex flex-col items-center justify-center h-[60vh] w-full">
+                    <div className="flex flex-col items-center justify-center h-[60vh] w-full px-6">
                         <div className="text-zinc-600 font-medium text-lg">
                             {selected === "fd" ? "No FD Investment Found" : "No Mutual Fund Investment Found"}
                         </div>

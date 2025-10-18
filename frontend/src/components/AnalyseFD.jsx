@@ -78,7 +78,7 @@ export const AnalyseFD = ({ selectedfd, client,setOpenAnalyse }) => {
 
                 {/* Projected returns */}
                 
-                    <div className='px-5 md:px-10 w-full flex flex-col items-center mt-5 md:mt-4 h-[78%] md:h-[70%]'>
+                    <div className='px-5 md:px-10 w-full flex flex-col items-center mt-5 md:mt-4 h-[78%] md:h-[70%] pb-5 md:pb-1'>
 
                         <div className="flex w-full md:w-[80%] mb-2 ">
 

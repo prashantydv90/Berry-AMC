@@ -105,7 +105,7 @@ export const Analyse = ({ setOpenAnalyse, selected, client }) => {
 
                 {/* Past returns */}
                 {(isPast && client?.MFPeriodicInterest && client?.MFPeriodicInterest.length > 0) ?
-                    <div className='px-5 md:px-10 w-full flex flex-col items-center mt-5 md:mt-6 h-[78%] md:h-[70%]'>
+                    <div className='px-5 md:px-10 w-full flex flex-col items-center mt-5 md:mt-6 h-[78%] md:h-[70%] pb-5 md:pb-1'>
 
                         <div className="flex w-full md:w-[80%] mb-2  ">
 
@@ -158,7 +158,7 @@ export const Analyse = ({ setOpenAnalyse, selected, client }) => {
 
                 {/* Projected returns */}
                 {!isPast &&
-                    <div className='px-5 md:px-10 w-full flex flex-col items-center mt-5 md:mt-4 h-[78%] md:h-[70%]'>
+                    <div className='px-5 md:px-10 w-full flex flex-col items-center mt-5 md:mt-4 h-[78%] md:h-[70%] pb-5 md:pb-1'>
                         {(projectedReturn && projectedReturn.length > 0) &&
                             <div className="flex w-full md:w-[80%] mb-2 ">
 
