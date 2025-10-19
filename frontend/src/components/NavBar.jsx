@@ -121,8 +121,16 @@ export const NavBar = () => {
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
                 onClick={()=>navigate('/forgot-password')}
               >
-                Forgot Password
+                Change Password
               </button>
+              {user && user.role==="admin" && 
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                onClick={()=>navigate('/admin')}
+              >
+                Admin Dashboard
+              </button>
+              }
             </div>
           </div>
         )}

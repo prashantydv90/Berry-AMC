@@ -21,6 +21,7 @@ import { ForgotPassword } from './components/ForgotPassword'
 import { ResetPassword } from './components/ResetPassword'
 import NProgress from './components/progressBar'
 import "./index.css";
+import ScrollToTop from './components/ScrollToTop'
 
 
 
@@ -37,7 +38,8 @@ function App() {
   }, [location]);
 
   return (
-  
+    <>
+      <ScrollToTop/>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
@@ -58,7 +60,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
 
       </Routes>
-    
+    </>
   )
 }
 
