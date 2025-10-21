@@ -54,7 +54,7 @@ export const ClientDetails = () => {
             const current = client?.MFTotalValue || 0;
             const returns = current - invested;
 
-            setTotalReturn(toIndianFormat(returns));
+            setTotalReturn(toIndianFormat(returns.toFixed(2)));
             setTotalReturnPercent(((returns / invested) * 100).toFixed(2));
         } else if (investmentType === 'fd' && client) {
             const returns = client.FDTotalValue - client.FDTotalInvested;
