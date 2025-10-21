@@ -32,6 +32,12 @@ app.use('/api',investmentRouter);
 app.use('/api',interestRouter);
 app.use('/api',contactUsRouter)
 
+app.get("/ping", (req, res) => {
+  res.status(200).send("alive");
+});
+
+
+
 cron.schedule("0 0 * * *", () => {
   console.log("⏰ Running daily FD updater...");
   updateFDs();
