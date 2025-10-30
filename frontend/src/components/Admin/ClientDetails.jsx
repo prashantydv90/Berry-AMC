@@ -18,7 +18,7 @@ export const ClientDetails = () => {
     const [investmentType, setInvestmentType] = useState("mf");
     const [interestForm, setInterestForm] = useState(false);
     const [investmentForm, setInvestmentForm] = useState(false);
-
+    const [cagr,setCagr]=useState(null);
 
 
     const { id } = useParams(); // ✅ get id from URL
@@ -45,6 +45,10 @@ export const ClientDetails = () => {
     const [totalReturn, setTotalReturn] = useState('');
     const [totalReturnPercent, setTotalReturnPercent] = useState('');
 
+    useEffect(()=>{
+        let CAGR= calculateYearlyInterest(client?.MFPeriodicInterest);
+        setCagr(CAGR);
+    },[client])
 
     useEffect(() => {
         if (!client) return;
@@ -140,6 +144,13 @@ export const ClientDetails = () => {
                                 <TrendingUp className="w-4 h-4 text-green-600" />
                                 <span><b>Returns:</b> ₹{totalReturn} ({totalReturnPercent > 0 ? totalReturnPercent : "0"}%)</span>
                             </div>
+
+                            {investmentType==="mf" && 
+                            <div className="flex items-center gap-2 text-sm text-zinc-700">
+                                <LineChart className="w-4 h-4 text-indigo-600" />
+                                <span><b>CAGR:</b> {cagr ? `${cagr}%` : "0%"}</span>
+                            </div>
+                            }
 
                         </div>
                     </div>
