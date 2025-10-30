@@ -2,7 +2,7 @@
 
 
 import React, { useState } from "react";
-import { IdCard, User, Home, Phone, Mail, Wallet, TrendingUp, CircleDollarSign, Calendar, Edit2, Trash2, CalendarDays, PiggyBank, IndianRupee } from "lucide-react";
+import { IdCard, User, Home, Phone, Mail, Wallet, TrendingUp, CircleDollarSign, Calendar, Edit2, Trash2, CalendarDays, PiggyBank, IndianRupee, LineChart } from "lucide-react";
 import { NavBar } from "../NavBar";
 import { AddInterestForm } from "./AddInterest";
 import { AddInvestmentForm } from "./AddInvestment";
@@ -10,7 +10,7 @@ import Footer from "../Footer";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
-import { formatDate, formatYearMonth, toIndianFormat } from "../utils";
+import { calculateYearlyInterest,formatDate, formatYearMonth, toIndianFormat } from "../utils";
 import { ToastContainer } from "react-toastify";
 
 
