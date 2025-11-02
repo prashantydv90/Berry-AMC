@@ -1,39 +1,33 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { toIndianFormat } from "../utils";
 
-export const AddInvestmentForm = ({ setInvestmentForm, client, investmentType }) => {
+export const EditInvestmentForm = ({
+  setEditInvestmentForm,
+  client,
+  investmentType, 
+  investment,   
+}) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [baseTotal, setBaseTotal] = useState(0);
 
   const [formData, setFormData] = useState({
-    clientId: "",
     investedValue: "",
     totalValue: "",
     date: "",
   });
 
-  const [baseTotal, setBaseTotal] = useState(0); // store current total before adding new investment
-
-  // ✅ Initialize when client/investmentType changes
+  // ✅ Pre-fill form when investment changes
   useEffect(() => {
-    if (client) {
-      const currentTotal =
-        investmentType === "mf"
-          ? Number(client.MFTotalValue || 0)
-          : Number(client.FDTotalValue || 0);
-
-      setBaseTotal(currentTotal);
-
-      setFormData((prev) => ({
-        ...prev,
-        clientId: client._id || client.client_id,
-        investedValue: "",
-        totalValue: currentTotal,
-      }));
+    if (investment) {
+      setFormData({
+        investedValue: investment.investedValue || "",
+        totalValue: investment.totalValue || "",
+        date: investment.date ? investment.date.split("T")[0] : "", // clean date
+      });
+      setBaseTotal(investment.totalValue-investment.investedValue);
     }
-  }, [client, investmentType]);
+  }, [investment]);
 
   // ✅ Handle input change
   const handleChange = (e) => {
@@ -54,46 +48,49 @@ export const AddInvestmentForm = ({ setInvestmentForm, client, investmentType })
     }
   };
 
-  // ✅ Submit form
-  // ✅ Submit form
+//   console.log(investment._id);
+
+  // ✅ Submit form (PUT request)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setIsLoading(true); // <-- show "Adding..."
-      const res = await axios.post(
-        `https://berry-amc.onrender.com/api/addinvestment/${investmentType}`,
+      setIsLoading(true);
+
+      const res = await axios.put(
+        `http://localhost:5555/api/editinvestment/${investmentType}/${investment._id}`,
         formData,
         { withCredentials: true }
       );
-      toast.success(res.data.message);
-      setFormData({ clientId: "", investedValue: "", totalValue: "", date: "" });
-      setInvestmentForm(false);
+
+      toast.success(res.data.message || "Investment updated successfully");
+
+      // Close modal
+      setEditInvestmentForm(false);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error adding investment");
+      console.error("Error updating investment:", error);
+      toast.error(error.response?.data?.message || "Error updating investment");
     } finally {
-      setIsLoading(false); // <-- back to normal
+      setIsLoading(false);
     }
   };
-
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-      <div className="relative mx-4 md:mx-0  w-[34rem] bg-white shadow-lg rounded-xl p-6">
+      <div className="relative mx-4 md:mx-0 w-[34rem] bg-white shadow-lg rounded-xl p-6">
         {/* Close Button */}
         <button
-          onClick={() => setInvestmentForm(false)}
+          onClick={() => setEditInvestmentForm(false)}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-3xl font-bold"
         >
           &times;
         </button>
 
         <h2 className="text-2xl font-bold mb-4">
-          Add {investmentType} Investment
+          Edit {investmentType.toUpperCase()} Investment
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Invested Value */}
 
             <div>
               <label className="block text-sm font-medium">Date of Investment</label>
@@ -107,10 +104,11 @@ export const AddInvestmentForm = ({ setInvestmentForm, client, investmentType })
               />
             </div>
 
+          {/* Invested Value */}
           <div>
             <label className="block text-sm font-medium">Invested Value</label>
             <input
-              type="text"
+              type="number"
               name="investedValue"
               value={formData.investedValue}
               onChange={handleChange}
@@ -135,14 +133,14 @@ export const AddInvestmentForm = ({ setInvestmentForm, client, investmentType })
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full mt-4 font-semibold py-2 rounded-lg transition ${isLoading
+            className={`w-full mt-4 font-semibold py-2 rounded-lg transition ${
+              isLoading
                 ? "bg-blue-400 text-white cursor-not-allowed"
                 : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+            }`}
           >
-            {isLoading ? "Adding..." : "Add Investment"}
+            {isLoading ? "Updating..." : "Update Investment"}
           </button>
-
         </form>
       </div>
     </div>

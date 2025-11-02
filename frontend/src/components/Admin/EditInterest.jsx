@@ -1,15 +1,14 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
-export const AddInterestForm = ({ setInterestForm, client }) => {
+export const EditInterestForm = ({ setEditInterestForm, interest, refreshData }) => {
   const [formData, setFormData] = useState({
-    startMonth: "",
-    endMonth: "",
-    returns: "",
+    startMonth: interest?.startMonth?.split("T")[0] || "",
+    endMonth: interest?.endMonth?.split("T")[0] || "",
+    returns: interest?.returns || "",
   });
-
   const [isLoading, setIsLoading] = useState(false);
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -19,18 +18,18 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     try {
-      const res = await axios.post(
-        `https://berry-amc.onrender.com/api/addinterest/${client._id}`,
+        setIsLoading(true);
+      const res = await axios.put(
+        `http://localhost:5555/api/editinterest/${interest._id}`,
         formData,
         { withCredentials: true }
       );
-      alert(res.data.message);
-      setFormData({ startMonth: "", endMonth: "", returns: "" });
-      setInterestForm(false);
+      toast.success(res.data.message);
+      setEditInterestForm(false);
     } catch (error) {
-      alert(error.response?.data?.message || "Error adding returns");
+      console.error("Error editing interest:", error);
+      toast.error(error.response?.data?.message || "Error updating interest");
     } finally {
       setIsLoading(false);
     }
@@ -38,16 +37,17 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
-      <div className="relative h-[24rem] w-[34rem] bg-white shadow-lg rounded-xl p-6">
+        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+      <div className="relative h-[24rem] w-[34rem] bg-white shadow-lg rounded-xl p-6 ">
         {/* Close Button */}
         <button
-          onClick={() => setInterestForm(false)}
+          onClick={() => setEditInterestForm(false)}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-3xl font-bold"
         >
           &times;
         </button>
 
-        <h2 className="text-2xl font-bold mb-4 text-center">Add Interest</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Edit Returns</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Start Month */}
@@ -78,9 +78,7 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
 
           {/* Returns */}
           <div>
-            <label className="block text-sm font-medium">
-              Returns (in amount)
-            </label>
+            <label className="block text-sm font-medium">Returns (in amount)</label>
             <input
               type="number"
               name="returns"
@@ -91,17 +89,16 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full font-semibold py-2 rounded-lg transition-colors ${
+            className={`w-full mt-2 font-semibold py-2 rounded-lg transition ${
               isLoading
-                ? "bg-purple-400 cursor-not-allowed text-white"
-                : "bg-purple-600 hover:bg-purple-700 text-white"
+                ? "bg-blue-400 text-white cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
             }`}
           >
-            {isLoading ? "Adding Interest..." : "Add Interest"}
+            {isLoading ? "Updating..." : "Update Return"}
           </button>
         </form>
       </div>

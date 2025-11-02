@@ -1,6 +1,3 @@
-
-
-
 import React, { useState } from "react";
 import { IdCard, User, Home, Phone, Mail, Wallet, TrendingUp, CircleDollarSign, Calendar, Edit2, Trash2, CalendarDays, PiggyBank, IndianRupee, LineChart } from "lucide-react";
 import { NavBar } from "../NavBar";
@@ -10,20 +7,27 @@ import Footer from "../Footer";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
-import { calculateYearlyInterest,formatDate, formatYearMonth, toIndianFormat } from "../utils";
-import { ToastContainer } from "react-toastify";
+import formatDateRange, { calculateYearlyInterest,formatDate, formatYearMonth, toIndianFormat } from "../utils";
+import { toast, ToastContainer } from "react-toastify";
+import { EditInvestmentForm } from "./EditInvestment";
+import { EditInterestForm } from "./EditInterest";
 
 
 export const ClientDetails = () => {
     const [investmentType, setInvestmentType] = useState("mf");
     const [interestForm, setInterestForm] = useState(false);
     const [investmentForm, setInvestmentForm] = useState(false);
-    const [cagr,setCagr]=useState(null);
+    const [editInvestmentForm, setEditInvestmentForm] = useState(false);
+    const [editInterestForm, setEditInterestForm] = useState(false);
+    const [cagr, setCagr] = useState(null);
+    const [investment, setInvestment] = useState(null);
+    const [interest, setInterest] = useState(null)
 
 
     const { id } = useParams(); // ✅ get id from URL
     const [client, setClient] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -40,7 +44,7 @@ export const ClientDetails = () => {
         };
 
         fetchClient();
-    }, [id, investmentForm, interestForm]); // re-run if id changes
+    }, [id, investmentForm, interestForm, editInvestmentForm, editInterestForm]); // re-run if id changes
 
     const [totalReturn, setTotalReturn] = useState('');
     const [totalReturnPercent, setTotalReturnPercent] = useState('');
@@ -67,11 +71,81 @@ export const ClientDetails = () => {
         }
     }, [investmentType, client]);
 
+    
+    // ===== DELETE INVESTMENT =====
+    const handleDeleteInvestment = async (type, id) => {
+        if (!window.confirm("Are you sure you want to delete this investment?")) return;
+
+        try {
+            setLoading(true); // Start loading
+
+            const url = `http://localhost:5555/api/deleteinvestment/${type}/${id}`;
+            await axios.delete(url, { withCredentials: true });
+
+            // Refresh client data
+            const res = await axios.get(
+                `http://localhost:5555/api/get1ClientDetails/${client._id}`,
+                { withCredentials: true }
+            );
+            setClient(res.data.data);
+        } catch (err) {
+            console.error("Error deleting investment:", err);
+            alert(err.response?.data?.message || "Failed to delete investment. Try again.");
+        } finally {
+            setLoading(false); // Always stop loading
+        }
+    };
+
+    const handleDeleteInterest = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this return?")) return;
+
+        try {
+            const url = `http://localhost:5555/api/deleteinterest/${id}`;
+            await axios.delete(url, { withCredentials: true });
+            // Refresh client data
+            const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${client._id}`, { withCredentials: true });
+            setClient(res.data.data);
+        } catch (err) {
+            console.error("Error deleting investment:", err);
+            alert("Failed to delete investment. Try again.");
+        }
+    };
+
+    const handleEditInvestment = (data) => {
+        setInvestment(data);
+        setEditInvestmentForm(true);
+    }
+
+    const handleEditInterest = (data) => {
+        setInterest(data);
+        setEditInterestForm(true);
+    }
+
+
+    const handleResetMFInvestment = async (id) => {
+        if (!window.confirm("Are you sure you want to remove all investments and returns?")) return;
+
+        setLoading(true);
+
+        try {
+            const url = `http://localhost:5555/api/resetInvestment/${investmentType}/${id}`;
+            await axios.delete(url, { withCredentials: true });
+            const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${client._id}`, { withCredentials: true });
+            toast.success("All investments and returns removed successfully!");
+            setClient(res.data.data);
+        } catch (err) {
+            toast.error(err.message || "Failed to delete investment. Try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (error) return <p className="text-red-500">Error: {error}</p>;
 
     return (
         <div className=' bg-zinc-100'>
             <NavBar />
+            <ToastContainer position="top-right" autoClose={3000} theme="colored" />
             {loading && <div className="min-h-screen flex justify-center items-center bg-zinc-100">
                 <div className="text-center">
                     <div className="loader border-t-4 border-blue-600 border-solid rounded-full w-12 h-12 animate-spin mx-auto mb-2"></div>
@@ -186,17 +260,21 @@ export const ClientDetails = () => {
 
                                     {client?.MFInvestments?.map((p) => (
                                         <div key={p._id} className="grid grid-cols-4 items-center py-3 px-3 bg-white border-b border-zinc-200 text-sm">
-                                            <div>{formatDate(p?.createdAt)}</div>
+                                            <div>{formatDate(p?.date)}</div>
                                             <div className="text-green-600">₹{toIndianFormat(p?.investedValue)}</div>
                                             <div>₹{toIndianFormat(p?.totalValue)}</div>
-                                            <div className="flex justify-center gap-3">
-                                                <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
-                                                    <Edit2 size={15} /> Edit
-                                                </button>
-                                                <button className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm">
-                                                    <Trash2 size={15} /> Delete
-                                                </button>
-                                            </div>
+                                            {index === 0 &&
+                                                <div className="flex justify-center gap-3">
+                                                    <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                                        onClick={() => handleEditInvestment(p)}>
+                                                        <Edit2 size={15} /> Edit
+                                                    </button>
+                                                    <button className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm"
+                                                        onClick={() => handleDeleteInvestment(investmentType, p._id)}>
+                                                        <Trash2 size={15} /> Delete
+                                                    </button>
+                                                </div>
+                                            }
                                         </div>
                                     ))}
                                 </div>
@@ -234,10 +312,14 @@ export const ClientDetails = () => {
                                             <div className="text-green-600 ml-2">+₹{toIndianFormat((p?.totalValue - p?.investedValue).toFixed(2))} ({((p?.totalValue - p?.investedValue) * 100 / p?.investedValue).toFixed(2)}%)</div>
                                             <div className="ml-3">₹{toIndianFormat(p.totalValue.toFixed(0))}</div>
                                             <div className="flex justify-center gap-3">
-                                                <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
+                                                <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                                    onClick={() => handleEditInvestment(p)}>
                                                     <Edit2 size={15} /> Edit
+
+
                                                 </button>
-                                                <button className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm">
+                                                <button className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm"
+                                                    onClick={() => handleDeleteInvestment(investmentType, p._id)}>
                                                     <Trash2 size={15} /> Delete
                                                 </button>
                                             </div>
@@ -259,6 +341,7 @@ export const ClientDetails = () => {
 
                     {/* Returns Section */}
                     {investmentType === "mf" &&
+                    <>
                         <div className="max-w-5xl mx-auto mt-6 bg-white rounded-xl shadow-md p-6">
                             <div className="flex flex-row justify-between items-center mb-4">
                                 <h3 className="text-lg font-semibold text-zinc-800 flex items-center gap-2">
@@ -286,24 +369,40 @@ export const ClientDetails = () => {
                                         <div className="flex justify-center items-center font-medium mt-4">No Returns</div>
                                     }
 
-                                    {client?.MFPeriodicInterest?.map((p) => (
-                                        <div key={p._id} className="grid grid-cols-4 items-center py-3 px-3 bg-white border-b border-zinc-200 text-sm">
-                                            <div>{formatYearMonth(p.startMonth, p.endMonth)}</div>
-                                            <div className="text-green-600">₹{toIndianFormat(p?.returns)} ({(p?.returns / (p?.totalValue - p?.returns) * 100).toFixed(2)}%)</div>
-                                            <div>₹{toIndianFormat(Number(p?.totalValue || 0).toFixed(0))}</div>
-                                            <div className="flex justify-center gap-3">
-                                                <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm">
-                                                    <Edit2 size={15} /> Edit
-                                                </button>
-                                                <button className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm">
-                                                    <Trash2 size={15} /> Delete
-                                                </button>
+                                    {client?.MFPeriodicInterest?.map((p, index) => (
+                                            <div key={p._id} className="grid grid-cols-4 items-center py-3 px-3 bg-white border-b border-zinc-200 text-sm">
+                                                <div>{formatDateRange(p?.startMonth, p?.endMonth)}</div>
+                                                <div className="text-green-600">₹{toIndianFormat(p?.returns)} ({(p?.returns / (p?.totalValue - p?.returns) * 100).toFixed(2)}%)</div>
+                                                <div>₹{toIndianFormat(Number(p?.totalValue || 0).toFixed(0))}</div>
+                                                {index === 0 &&
+                                                    <div className="flex justify-center gap-3">
+                                                        <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                                            onClick={() => handleEditInterest(p)}>
+                                                            <Edit2 size={15} /> Edit
+                                                        </button>
+                                                        <button className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm"
+                                                            onClick={() => handleDeleteInterest(p._id)}>
+                                                            <Trash2 size={15} /> Delete
+                                                        </button>
+                                                    </div>
+                                                }
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
                                 </div>
                             </div>
                         </div>
+
+                        <div className="text-white flex justify-center items-center mt-10">
+                                <button
+                                    onClick={() => handleResetMFInvestment(id)}
+                                    disabled={isLoading}
+                                    className={`${isLoading ? "bg-gray-500 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+                                        } px-4 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer`}
+                                >
+                                    {isLoading ? "Removing All Investment and Returns..." : "Remove All Investment and Returns"}
+                                </button>
+                            </div>
+                            </>
                     }
 
                 </div>
@@ -311,6 +410,8 @@ export const ClientDetails = () => {
             </div>
             {interestForm && <AddInterestForm setInterestForm={setInterestForm} client={client} />}
             {investmentForm && <AddInvestmentForm setInvestmentForm={setInvestmentForm} investmentType={investmentType} client={client} />}
+            {editInvestmentForm && <EditInvestmentForm setEditInvestmentForm={setEditInvestmentForm} investmentType={investmentType} client={client} investment={investment} />}
+            {editInterestForm && <EditInterestForm setEditInterestForm={setEditInterestForm} interest={interest} />}
             <Footer />
         </div>
     );

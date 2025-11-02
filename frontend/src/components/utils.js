@@ -7,6 +7,35 @@ export const  formatDate=(dateString)=> {
   });
 }
 
+export default function formatDateRange(startDate, endDate) {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const s = new Date(startDate);
+  const e = new Date(endDate);
+
+  const sDay = s.getDate();
+  const sMonth = months[s.getMonth()];
+  const sYear = s.getFullYear();
+
+  const eDay = e.getDate();
+  const eMonth = months[e.getMonth()];
+  const eYear = e.getFullYear();
+
+  // If same year
+  if (sYear === eYear) {
+    // If same month
+    if (s.getMonth() === e.getMonth()) {
+      return `${sDay}–${eDay} ${sMonth} ${sYear}`;
+    } else {
+      return `${sDay} ${sMonth} – ${eDay} ${eMonth} ${sYear}`;
+    }
+  }
+
+  // If year changes
+  return `${sDay} ${sMonth} ${String(sYear).slice(-2)}-${eDay} ${eMonth} ${String(eYear).slice(-2)}`;
+}
+
 
 export const formatYearMonth = (startMonth, endMonth) => {
 if (!startMonth || !endMonth) return "—";
