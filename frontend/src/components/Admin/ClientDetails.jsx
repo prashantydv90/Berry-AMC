@@ -258,7 +258,7 @@ export const ClientDetails = () => {
                                         <div className="flex justify-center items-center font-medium mt-4">No Investments</div>
                                     }
 
-                                    {client?.MFInvestments?.map((p) => (
+                                    {client?.MFInvestments?.map((p,index) => (
                                         <div key={p._id} className="grid grid-cols-4 items-center py-3 px-3 bg-white border-b border-zinc-200 text-sm">
                                             <div>{formatDate(p?.date)}</div>
                                             <div className="text-green-600">₹{toIndianFormat(p?.investedValue)}</div>
