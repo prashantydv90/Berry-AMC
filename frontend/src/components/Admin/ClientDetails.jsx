@@ -100,6 +100,7 @@ export const ClientDetails = () => {
         if (!window.confirm("Are you sure you want to delete this return?")) return;
 
         try {
+            setLoading(true);
             const url = `https://berry-amc.onrender.com/api/deleteinterest/${id}`;
             await axios.delete(url, { withCredentials: true });
             // Refresh client data
@@ -108,6 +109,8 @@ export const ClientDetails = () => {
         } catch (err) {
             console.error("Error deleting investment:", err);
             alert("Failed to delete investment. Try again.");
+        } finally{
+            setLoading(false);
         }
     };
 

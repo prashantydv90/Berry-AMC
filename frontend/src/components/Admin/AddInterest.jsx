@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 export const AddInterestForm = ({ setInterestForm, client }) => {
   const [formData, setFormData] = useState({
@@ -26,11 +27,11 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
         formData,
         { withCredentials: true }
       );
-      alert(res.data.message);
+      toast.success(res.data.message);
       setFormData({ startMonth: "", endMonth: "", returns: "" });
       setInterestForm(false);
     } catch (error) {
-      alert(error.response?.data?.message || "Error adding returns");
+      toast.error(error.response?.data?.message || "Error adding returns");
     } finally {
       setIsLoading(false);
     }
@@ -38,6 +39,7 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
       <div className="relative h-[24rem] w-[34rem] bg-white shadow-lg rounded-xl p-6">
         {/* Close Button */}
         <button
