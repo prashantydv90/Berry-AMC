@@ -11,6 +11,7 @@ import formatDateRange, { calculateYearlyInterest,formatDate, formatYearMonth, t
 import { toast, ToastContainer } from "react-toastify";
 import { EditInvestmentForm } from "./EditInvestment";
 import { EditInterestForm } from "./EditInterest";
+import calculateClientXIRR from "../xirr";
 
 
 export const ClientDetails = () => {
