@@ -84,7 +84,7 @@ import { Analyse } from "./Analyse";
 import { OrderForm } from "./OrderForm";
 import Footer from "./Footer";
 import axios from "axios";
-import { formatYearMonth, toIndianFormat } from "./utils";
+import formatDateRange, { formatYearMonth, toIndianFormat } from "./utils";
 import { AnalyseFD } from "./AnalyseFD";
 import { useUser } from "./UserContext";
 import { Loader2 } from "lucide-react";
@@ -405,7 +405,7 @@ export const DashBoard = () => {
                                 <div className="md:w-1/3 w-full flex flex-row md:flex-col">
                                     <div className="font-medium text-[15px] md:text-[13.5px] text-zinc-600 ml-auto">
                                         {selected === "mf"
-                                            ? formatYearMonth(client?.MFPeriodicInterest[0]?.startMonth, client?.MFPeriodicInterest[0]?.endMonth)
+                                            ? formatDateRange(client?.MFPeriodicInterest[0]?.startMonth, client?.MFPeriodicInterest[0]?.endMonth)
                                             : "Rate of Interest"}
                                     </div>
                                     <div className="font-semibold flex flex-1 justify-end md:justify-start text-md ml-auto text-green-600">
