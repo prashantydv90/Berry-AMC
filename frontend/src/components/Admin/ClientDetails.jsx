@@ -20,7 +20,7 @@ export const ClientDetails = () => {
     const [investmentForm, setInvestmentForm] = useState(false);
     const [editInvestmentForm, setEditInvestmentForm] = useState(false);
     const [editInterestForm, setEditInterestForm] = useState(false);
-    const [cagr, setCagr] = useState(null);
+    // const [cagr, setCagr] = useState(null);
     const [xirr, setXirr] = useState(null);
     const [investment, setInvestment] = useState(null);
     const [interest, setInterest] = useState(null)
@@ -52,8 +52,8 @@ export const ClientDetails = () => {
     const [totalReturnPercent, setTotalReturnPercent] = useState('');
 
     useEffect(() => {
-        let CAGR = calculateYearlyInterest(client?.MFPeriodicInterest);
-        setCagr(CAGR);
+        // let CAGR = calculateYearlyInterest(client?.MFPeriodicInterest);
+        // setCagr(CAGR);
         let XIRR=calculateClientXIRR(client);
         setXirr(XIRR);
     }, [client])
@@ -228,10 +228,10 @@ export const ClientDetails = () => {
 
                             {investmentType === "mf" &&
                             <>
-                                <div className="flex items-center gap-2 text-sm text-zinc-700">
+                                {/* <div className="flex items-center gap-2 text-sm text-zinc-700">
                                     <LineChart className="w-4 h-4 text-indigo-600" />
                                     <span><b>CAGR:</b> {cagr ? `${cagr}%` : "0%"}</span>
-                                </div>
+                                </div> */}
                                 <div className="flex items-center gap-2 text-sm text-zinc-700">
                                     <LineChart className="w-4 h-4 text-indigo-600" />
                                     <span><b>XIRR:</b> {xirr ? `${xirr}%` : "0%"}</span>

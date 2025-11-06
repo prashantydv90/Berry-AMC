@@ -92,6 +92,7 @@ import { Link } from "react-router-dom";
 
 import { AiOutlineBank } from "react-icons/ai"; // icons for MF and FD
 import { ChevronDown } from "lucide-react";
+import InvestmentTable from "./investmentDetailsCard";
 
 export const DashBoard = () => {
     const [openAnalyse, setOpenAnalyse] = useState(false);
@@ -102,10 +103,27 @@ export const DashBoard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { user, setUser } = useUser();
+    const [xirr,setXirr]=useState(null);
     
 
     const [totalReturn, setTotalReturn] = useState("");
     const [totalReturnPercent, setTotalReturnPercent] = useState("");
+
+    useEffect(() => {
+        let XIRR=calculateClientXIRR(client);
+        setXirr(XIRR);
+    }, [client])
+
+    const [investments,setInvestments]=useState(null)
+    useEffect(()=>{
+        let investment=null;
+        if(client){
+            if(selected==="mf") setInvestments(client.MFInvestments);
+            else setInvestments(client.FDInvestments);
+        }
+    },[client,selected])
+
+
     useEffect(() => {
         const fetchUser = async () => {
             if (!user) return;
@@ -317,7 +335,7 @@ export const DashBoard = () => {
                                 ))}
                             </select>
                         )} */}
-                        <div className="md:w-[55%] w-[90%]">
+                        <div className="md:w-[60%] 2xl:w-[55%] w-[90%]">
                             <div className="w-50">
                             {selected === "fd" && client?.FDInvestments?.length > 1 && (
                                 <CustomDropdown
@@ -340,7 +358,7 @@ export const DashBoard = () => {
 
 
                         {/* Investment Summary Card */}
-                        <div className="min-h-[15rem] md:w-[55%] w-[90%] shadow-md border border-zinc-300 rounded-xl mt-2">
+                        <div className="min-h-[15rem] md:w-[60%] 2xl:w-[55%] w-[90%] shadow-md border border-zinc-300 rounded-xl mt-2">
                             {/* Upper */}
                             <div className="h-[7.5rem] w-full border-b border-zinc-300 flex items-center px-4 md:px-7">
                                 <div className="w-1/2">
@@ -419,6 +437,8 @@ export const DashBoard = () => {
                                 </div>
                             </div>
                         </div>
+                        {investments && 
+                        <div className="md:w-[60%] 2xl:w-[55%] w-[90%]  border border-zinc-300 shadow-md rounded-xl mt-15 mb-20"><InvestmentTable investments={investments}/></div>}
                     </div>
                 )}
             </div>
@@ -431,125 +451,6 @@ export const DashBoard = () => {
             )}
             {openForm && <OrderForm setOpenForm={setOpenForm} />}
             <Footer />
-        </div>
-    );
-};
-
-
-
-
-// const CustomDropdown = ({ label, options, value, onChange }) => {
-    
-//     const [open, setOpen] = useState(false);
-//     const handleSelect = (option) => {
-//         onChange(option.value);
-//         setOpen(false);
-//     };
-
-//     return (
-//         <div className="w-full max-w-sm relative">
-//             {/* Label */}
-//             <label className="absolute -top-2 left-3 bg-zinc-50 text-zinc-500 px-1 text-[11px] font-medium">
-//                 {label}
-//             </label>
-
-//             {/* Selected Value */}
-//             <div
-//                 className="border border-zinc-300 rounded-md p-2 flex justify-between items-center cursor-pointer hover:border-blue-500 transition"
-//                 onClick={() => setOpen(!open)}
-//             >
-//                 <div className="flex items-center gap-2 font-medium text-[13px]">
-//                     {options.find((opt) => opt.value === value)?.icon}
-//                     <span>
-//                         {options.find((opt) => opt.value === value)?.label || "Select"}
-//                     </span>
-//                 </div>
-//                 <ChevronDown size={16} />
-//             </div>
-
-//             {/* Options */}
-//             {open && (
-//                 <div className="absolute top-full left-0 w-full mt-1 bg-white border border-zinc-300 rounded-md shadow-lg z-50 max-h-60 overflow-auto text-[13px]">
-//                     {options.map((opt) => (
-//                         <div
-//                             key={opt.value}
-//                             className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer"
-//                             onClick={() => handleSelect(opt)}
-//                         >
-//                             {opt.icon}
-//                             <span>{opt.label}</span>
-//                         </div>
-//                     ))}
-//                 </div>
-//             )}
-//         </div>
-//     );
-// };
-
-
-
-
-
-const CustomDropdown = ({ label, options, value, onChange }) => {
-    const [open, setOpen] = useState(false);
-    const dropdownRef = useRef(null);
-
-    const handleSelect = (option) => {
-        onChange(option.value);
-        setOpen(false);
-    };
-
-    // Close dropdown if click outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    return (
-        <div className="w-full max-w-sm relative" ref={dropdownRef}>
-            {/* Label */}
-            <label className="absolute -top-2 left-3 bg-zinc-50 text-zinc-500 px-1 text-[11px] font-medium">
-                {label}
-            </label>
-
-            {/* Selected Value */}
-            <div
-                className="border border-zinc-300 rounded-md p-2 flex justify-between items-center cursor-pointer hover:border-blue-500 transition"
-                onClick={() => setOpen(!open)}
-            >
-                <div className="flex items-center gap-2 font-medium text-[13px]">
-                    {options.find((opt) => opt.value === value)?.icon}
-                    <span>
-                        {options.find((opt) => opt.value === value)?.label || "Select"}
-                    </span>
-                </div>
-                <ChevronDown size={16} className={`transition-transform ${open ? "rotate-180" : "rotate-0"}`} />
-            </div>
-
-            {/* Options with animation */}
-            <div
-                className={`absolute top-full left-0 w-full mt-1 bg-white border border-zinc-300 rounded-md shadow-lg z-50 max-h-60 overflow-auto text-[13px]
-                transform transition-all duration-200 ease-in-out origin-top ${
-                    open ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0 pointer-events-none"
-                }`}
-            >
-                {options.map((opt) => (
-                    <div
-                        key={opt.value}
-                        className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                        onClick={() => handleSelect(opt)}
-                    >
-                        {opt.icon}
-                        <span>{opt.label}</span>
-                    </div>
-                ))}
-            </div>
         </div>
     );
 };
