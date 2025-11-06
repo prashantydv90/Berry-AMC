@@ -456,4 +456,66 @@ export const DashBoard = () => {
     );
 };
 
+const CustomDropdown = ({ label, options, value, onChange }) => {
+    const [open, setOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
+    const handleSelect = (option) => {
+        onChange(option.value);
+        setOpen(false);
+    };
+
+    // Close dropdown if click outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <div className="w-full max-w-sm relative" ref={dropdownRef}>
+            {/* Label */}
+            <label className="absolute -top-2 left-3 bg-zinc-50 text-zinc-500 px-1 text-[11px] font-medium">
+                {label}
+            </label>
+
+            {/* Selected Value */}
+            <div
+                className="border border-zinc-300 rounded-md p-2 flex justify-between items-center cursor-pointer hover:border-blue-500 transition"
+                onClick={() => setOpen(!open)}
+            >
+                <div className="flex items-center gap-2 font-medium text-[13px]">
+                    {options.find((opt) => opt.value === value)?.icon}
+                    <span>
+                        {options.find((opt) => opt.value === value)?.label || "Select"}
+                    </span>
+                </div>
+                <ChevronDown size={16} className={`transition-transform ${open ? "rotate-180" : "rotate-0"}`} />
+            </div>
+
+            {/* Options with animation */}
+            <div
+                className={`absolute top-full left-0 w-full mt-1 bg-white border border-zinc-300 rounded-md shadow-lg z-50 max-h-60 overflow-auto text-[13px]
+                transform transition-all duration-200 ease-in-out origin-top ${
+                    open ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0 pointer-events-none"
+                }`}
+            >
+                {options.map((opt) => (
+                    <div
+                        key={opt.value}
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                        onClick={() => handleSelect(opt)}
+                    >
+                        {opt.icon}
+                        <span>{opt.label}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
