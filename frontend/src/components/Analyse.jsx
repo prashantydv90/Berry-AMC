@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { BarChart3, Target, TrendingUp, Wallet, History, Calendar, ChevronDown } from "lucide-react";
 import { calculateYearlyInterest, formatYearMonth, getAnnualizedReturn, getProjectedReturns, toIndianFormat } from './utils';
+import calculateClientXIRR from './xirr';
 
 
 
@@ -22,7 +23,7 @@ export const Analyse = ({ setOpenAnalyse, selected, client }) => {
         const finalValue = client?.MFTotalValue
 
         // const CAGR = getAnnualizedReturn(initialValue, finalValue, len * 3);
-        const Cagr = calculateYearlyInterest(client.MFPeriodicInterest);
+        const Cagr = calculateClientXIRR(client);
         setCAGR(Cagr);
 
         const [startYear, startM] = latest.endMonth.split("-").map(Number);
@@ -96,7 +97,7 @@ export const Analyse = ({ setOpenAnalyse, selected, client }) => {
 
                     </div>
                     {CAGR &&
-                        <span className='flex-1 text-end pr-1 md:pr-0 md:text-center text-[15px] font-medium'>CAGR - {CAGR}%</span>
+                       <span className='flex-1 text-end pr-1 md:pr-0 md:text-center text-[15px] font-medium text-zinc-600'>XIRR - <span className='text-green-600'>{CAGR}%</span></span>
                     }
 
                 </div>

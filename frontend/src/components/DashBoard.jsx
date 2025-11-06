@@ -436,6 +436,16 @@ export const DashBoard = () => {
                                         +₹{totalReturn} ({totalReturnPercent}%)
                                     </div>
                                 </div>
+                                {selected==="mf" &&
+                                <div className="flex flex-row md:flex-col md:w-1/5 w-full ">
+                                    <div className="font-medium text-[15px] md:text-[13.5px] text-zinc-600 ml-auto">
+                                        XIRR
+                                    </div>
+                                    <div className="font-semibold flex flex-1 justify-end md:justify-start text-md ml-auto text-green-600">
+                                        {xirr}%
+                                    </div>
+                                </div>
+                                }
                             </div>
                         </div>
                         {investments && 
