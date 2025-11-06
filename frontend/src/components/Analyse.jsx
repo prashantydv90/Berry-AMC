@@ -135,7 +135,7 @@ export const Analyse = ({ setOpenAnalyse, selected, client }) => {
 
                                 <div key={item._id} className='flex w-full md:w-[80%] mb-2 md:mb-0.5 '>
 
-                                    <div className='w-1/3 md:w-4/10 text-[15px]  font-medium leading-tight pr-3'>{formatDateRange(item.startMonth, item.endMonth)}</div>
+                                    <div className='w-1/3 md:w-4/10 text-[15px]  font-medium leading-tight pr-3'>{formatYearMonth(item.startMonth, item.endMonth)}</div>
 
                                     <div className='w-1/3 md:w-3/10 pr-4 md:pr-0 flex flex-wrap md:justify-end justify-center text-[15px] text-green-600 font-medium'>
                                         <div className='leading-tight  md:pr-0'>₹{toIndianFormat(item?.returns.toFixed(2))}</div>

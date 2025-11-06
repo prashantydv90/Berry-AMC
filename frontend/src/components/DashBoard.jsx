@@ -387,7 +387,7 @@ export const DashBoard = () => {
                             </div>
 
                             {/* Lower */}
-                            <div className="min-h-[7.5rem] pt-4 gap-1 md:gap-0 md:py-0 w-full flex md:flex-row flex-col md:items-center px-4 md:px-7">
+                            <div className="min-h-[7.5rem] pb-4 pt-4 gap-1 md:gap-0 md:py-0 w-full flex md:flex-row flex-col md:items-center px-4 md:px-7">
                                 <div className="md:w-1/3 w-full flex flex-row md:flex-col">
                                     <div className="font-medium text-[15px] md:text-[13.5px] text-zinc-600">
                                         Invested
@@ -405,7 +405,7 @@ export const DashBoard = () => {
                                 <div className="md:w-1/3 w-full flex flex-row md:flex-col">
                                     <div className="font-medium text-[15px] md:text-[13.5px] text-zinc-600 ml-auto">
                                         {selected === "mf"
-                                            ? formatDateRange(client?.MFPeriodicInterest[0]?.startMonth, client?.MFPeriodicInterest[0]?.endMonth)
+                                            ? formatYearMonth(client?.MFPeriodicInterest[0]?.startMonth, client?.MFPeriodicInterest[0]?.endMonth)
                                             : "Rate of Interest"}
                                     </div>
                                     <div className="font-semibold flex flex-1 justify-end md:justify-start text-md ml-auto text-green-600">
