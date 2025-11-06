@@ -93,6 +93,7 @@ import { Link } from "react-router-dom";
 import { AiOutlineBank } from "react-icons/ai"; // icons for MF and FD
 import { ChevronDown } from "lucide-react";
 import InvestmentTable from "./investmentDetailsCard";
+import calculateClientXIRR from "./xirr";
 
 export const DashBoard = () => {
     const [openAnalyse, setOpenAnalyse] = useState(false);
