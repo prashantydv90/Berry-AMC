@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import logo from "../assets/BAMClogo.png"
 import man from "../assets/man.avif"
-import Abhishek from "../assets/Abhishek.jpg"
-import Vedant from "../assets/Vedant.jpg"
-import Umang from "../assets/Umang.jpg"
-import Vivek from "../assets/Vivek.jpg"
+import Abhishek from "../assets/Abhishek.png"
+import Vedant from "../assets/Vedant.png"
+import Umang from "../assets/Umang.png"
+import Vivek from "../assets/Vivek.png"
 import { NavBar } from "./NavBar";
 import { Wallet, PieChart, FileText } from "lucide-react"; // lucide icons
 import Footer from "./Footer";
