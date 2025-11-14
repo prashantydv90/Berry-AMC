@@ -17,7 +17,7 @@ export const ClientReqData = async (req, res) => {
     const existingClient = await Client.findOne({ $or: [{ email }, { phone }, { PAN }] });
     if (existingClient) {
       return res.status(409).json({
-        message: "You are already registered as our client.",
+        message: "You are already registered as our investor.",
         success: false,
       });
     }
@@ -64,7 +64,7 @@ export const getClientRequests = async (req, res) => {
     const requests = await ClientReq.find({}).sort({ createdAt: -1 });
     res.json({ success: true, data: requests });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error fetching client requests", error: error.message });
+    res.status(500).json({ success: false, message: "Error fetching investor requests", error: error.message });
   }
 };
 
@@ -76,7 +76,7 @@ export const deleteClientRequest = async (req, res) => {
 
     const request = await ClientReq.findById(id);
     if (!request) {
-      return res.status(404).json({ success: false, message: "Client request not found" });
+      return res.status(404).json({ success: false, message: "Investor request not found" });
     }
 
     await ClientReq.findByIdAndDelete(id);

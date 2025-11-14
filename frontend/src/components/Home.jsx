@@ -25,17 +25,17 @@ export default function HomePage() {
     },
     {
       name: "Vivek ",
-      role: "Founder",
+      role: "Co-Founder",
       img: Vivek,
     },
     {
       name: "Umang ",
-      role: "Founder",
+      role: "CEO",
       img: Umang,
     },
     {
       name: "Vedant ",
-      role: "Founder",
+      role: "CFO",
       img: Vedant,
     },
 

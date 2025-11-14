@@ -66,7 +66,7 @@ export const ClientRequestForm = ({ onClose }) => {
             <X size={22} />
           </button> */}
 
-          <h2 className="text-2xl text-center font-bold mb-4">Become Our Client</h2>
+          <h2 className="text-2xl text-center font-bold mb-4">Become Our Investor</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
