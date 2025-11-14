@@ -227,16 +227,16 @@ export const DashBoard = () => {
                 <NavBar />
                 <div className=" h-screen text-center flex flex-col items-center justify-center px-6">
                     <h2 className="text-2xl font-semibold text-zinc-700 mb-2">
-                        You’re not registered as a client yet
+                        You’re not registered as a investor yet
                     </h2>
                     <p className="text-zinc-500 mb-4">
-                        Become a client to start tracking your investments.
+                        Become a investor to start tracking your investments.
                     </p>
                     <Link
                         to="/client/registration"
                         className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg shadow-md transition-all"
                     >
-                        Become a Client
+                        Become a Investor
                     </Link>
                 </div>
                 <Footer />
@@ -249,7 +249,7 @@ export const DashBoard = () => {
             <div className="flex flex-col items-center justify-center h-screen bg-zinc-50 px-6">
                 <NavBar />
                 <p className="text-zinc-500 font-medium">
-                    No client data found for your account.
+                    No investment data found for your account.
                 </p>
             </div>
         );
