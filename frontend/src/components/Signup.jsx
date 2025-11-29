@@ -8,6 +8,7 @@ import { NavBar } from './NavBar';
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import Footer from './Footer';
 import { toast, ToastContainer } from 'react-toastify';
+import { useUser } from './UserContext';
 
 export const Signup = () => {
   const navigate = useNavigate();
