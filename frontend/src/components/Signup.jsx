@@ -50,18 +50,60 @@ export const Signup = () => {
       toast.warning("Please enter the OTP");
       return;
     }
+
     setLoading(true);
     try {
-      const res = await axios.post('https://berry-amc.onrender.com/api/signup/verify-otp', {
-        email: form.email,
-        otp
-      });
-      if (res.data) {
-        toast.success(res.data.message);
-         setTimeout(() => navigate("/user/login"), 500);
+      const res = await axios.post(
+        'https://berry-amc.onrender.com/api/signup/verify-otp',
+        { email: form.email, otp }
+      );
+
+      toast.success(res.data.message);
+
+      // auto-login after OTP success
+      const loginResult = await handleLogin();
+
+      if (loginResult.success) {
+        navigate("/client/registration");
+      } else {
+        navigate("/user/login");
       }
+
     } catch (err) {
       toast.error(err.response?.data?.message || 'OTP verification failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+
+  const { setUser } = useUser();
+
+  const handleLogin = async () => {
+    const email = form.email.trim();
+    const password = form.password.trim();
+
+    if (!email || !password) {
+      toast.warning("Please enter both email and password");
+      return { success: false };
+    }
+
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        'https://berry-amc.onrender.com/api/login',
+        { email, password },
+        { withCredentials: true }
+      );
+
+      setUser(res.data.user);
+      return { success: true };
+
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Login failed');
+      return { success: false };
     } finally {
       setLoading(false);
     }

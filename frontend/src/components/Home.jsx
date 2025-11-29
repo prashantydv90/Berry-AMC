@@ -23,11 +23,11 @@ export default function HomePage() {
       role: "Founder",
       img: Abhishek, // replace with actual image
     },
-    {
-      name: "Vivek ",
-      role: "Co-Founder",
-      img: Vivek,
-    },
+    // {
+    //   name: "Vivek ",
+    //   role: "Co-Founder",
+    //   img: Vivek,
+    // },
     {
       name: "Umang ",
       role: "CEO",
