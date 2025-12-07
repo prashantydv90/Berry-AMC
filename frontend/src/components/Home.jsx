@@ -84,7 +84,7 @@ export default function HomePage() {
         <div className="md:w-1/2 ">
           <h2 className="text-3xl text-center md:text-start font-bold text-gray-800 mb-4">About Us</h2>
           <p className="text-gray-600 text-center md:text-start font-medium max-w-2xl">
-            Berry AMC is founded and managed by Abhishek, Umang, Vedant and Vivek. All are undergraduate students at IIT Jammu.<br></br>
+            Berry AMC is founded and managed by Abhishek, Umang and Vedant. All are undergraduate students at IIT Jammu.<br></br>
 
             We believe that our youth and academic background provide us with a unique
             advantage, allowing us to approach problems with fresh ideas and a relentless
