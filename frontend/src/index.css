@@ -1,0 +1,66 @@
+ @import "tailwindcss";
+/* 
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  background: linear-gradient(to right, #06b6d4, #3b82f6);
+  height: 3px;
+  border-radius: 2px;
+  transition: opacity 0.4s ease;
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px #3b82f6, 0 0 5px #06b6d4;
+  opacity: 1;
+}
+
+#nprogress.done .bar {
+  opacity: 0;
+} 
+
+ */
+
+
+/* Now override NProgress styles after Tailwind */
+#nprogress .bar {
+  background: linear-gradient(to left, #06b6d4, #3b82f6);
+  height: 3px;
+  border-radius: 2px;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #3b82f6, 0 0 5px #06b6d4;
+}
+
+#nprogress .spinner {
+  display: none !important; /* Ensures no spinner shows */
+}
+
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
