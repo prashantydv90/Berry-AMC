@@ -357,7 +357,7 @@ export const ClientDetails = () => {
                                     {client?.FDInvestments?.map((p) => (
                                         <div key={p._id} className="grid grid-cols-6 items-center py-3 px-3 bg-white border-b border-zinc-200 text-sm">
                                             <div>{formatDate(p?.investedDate)}</div>
-                                            <div className="ml-2">₹{toIndianFormat(p?.investedValue.toFixed(2))}</div>
+                                            <div className="ml-2">₹{toIndianFormat(p?.investedAtBeginning.toFixed(2))}</div>
                                             <div className="ml-5">{p?.rate}%</div>
                                             <div className="text-green-600 ml-2">+₹{toIndianFormat((p?.totalValue - p?.investedValue).toFixed(2))} ({((p?.totalValue - p?.investedValue) * 100 / p?.investedValue).toFixed(2)}%)</div>
                                             <div className="ml-3">₹{toIndianFormat(p.totalValue.toFixed(0))}</div>
