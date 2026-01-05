@@ -47,7 +47,7 @@ export const addInterest = async (req, res) => {
     const investmentsInPeriod = await MFInvestment.find({
       client: clientId,
       date: {
-        $gte: new Date(startMonth),
+        // $gte: new Date(startMonth),
         $lte: new Date(endMonth),
       },
     });
