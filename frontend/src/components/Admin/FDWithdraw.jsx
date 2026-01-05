@@ -57,7 +57,7 @@
 //       setIsLoading(true);
 
 //       await axios.post(
-//         `https://berry-amc.onrender.com/api/fdwithdraw/${selectedFD._id}`,
+//         `http://localhost:5555/api/fdwithdraw/${selectedFD._id}`,
 //         { amount }, { withCredentials: true }
 //       );
 
@@ -231,7 +231,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { formatDate } from "../utils";
+import { calculateFDValue, formatDate } from "../utils";
 
 export const FDWithdraw = ({ setWithdrawForm, client }) => {
   const [selectedFD, setSelectedFD] = useState(null);
@@ -245,17 +245,29 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
   const formatINR = (num) =>
     Number(num).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
+  const computedFD = selectedFD
+    ? calculateFDValue(
+      Number(selectedFD.investedValue),
+      selectedFD.date,
+      withdrawDate
+    )
+    : null;
+
+  const currentValue = computedFD ? computedFD.value : 0;
+  const currentRate = computedFD ? computedFD.rate : 0;
+
   const remainingValue =
     selectedFD && amount
-      ? Math.max(Number(selectedFD.totalValue) - Number(amount), 0)
+      ? Math.max(currentValue - Number(amount), 0)
       : null;
 
   const isFullWithdraw =
-    selectedFD && Number(amount) === Number(selectedFD.totalValue);
+    selectedFD && Number(amount) >= currentValue;
+
 
   const handleWithdrawAll = () => {
     if (!selectedFD) return;
-    setAmount(Number(selectedFD.totalValue));
+    setAmount(Number(currentValue));
     setConfirm(false);
   };
 
@@ -272,10 +284,11 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
       return;
     }
 
-    if (Number(amount) > Number(selectedFD.totalValue)) {
-      toast.error("Amount exceeds FD value");
+    if (Number(amount) > currentValue) {
+      toast.error("Amount exceeds current FD value");
       return;
     }
+
 
     if (!withdrawDate) {
       toast.error("Please select withdrawal date");
@@ -296,10 +309,11 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
       setIsLoading(true);
 
       await axios.post(
-        `https://berry-amc.onrender.com/api/fdwithdraw/${selectedFD._id}`,
+        `http://localhost:5555/api/fdwithdraw/${selectedFD._id}`,
         {
           amount: Number(amount),
           date: withdrawDate,
+          fdValueAtWithdrawal:Number(currentValue)
         },
         { withCredentials: true }
       );
@@ -318,7 +332,7 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
 
-      <div className="relative w-[38rem] bg-white rounded-2xl shadow-xl p-6 mx-4">
+      <div className="relative max-h-95/100 w-[38rem] bg-white rounded-2xl shadow-xl p-6 mx-4 overflow-y-auto">
         {/* Close */}
         <button
           onClick={() => setWithdrawForm(false)}
@@ -369,16 +383,19 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
                   ₹{formatINR(selectedFD.investedValue)}
                 </p>
               </div>
+
               <div>
-                <p className="text-gray-500">Current Value</p>
+                <p className="text-gray-500">Current Value (as of selected date)</p>
                 <p className="font-semibold">
-                  ₹{formatINR(selectedFD.totalValue)}
+                  ₹{formatINR(currentValue)}
                 </p>
               </div>
+
               <div>
-                <p className="text-gray-500">ROI</p>
-                <p className="font-semibold">{selectedFD.rate}%</p>
+                <p className="text-gray-500">ROI (dynamic)</p>
+                <p className="font-semibold">{currentRate}%</p>
               </div>
+
               <div>
                 <p className="text-gray-500">Start Date</p>
                 <p className="font-semibold">
@@ -387,6 +404,7 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
               </div>
             </div>
           )}
+
 
           {/* WITHDRAW DATE */}
           {selectedFD && (
@@ -417,7 +435,7 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
                 <input
                   type="number"
                   step="0.01"
-                  max={selectedFD.totalValue}
+                  max={currentValue}
                   value={amount}
                   onChange={(e) => {
                     setAmount(e.target.value);
@@ -439,7 +457,7 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
           )}
 
           {/* PREVIEW */}
-          {selectedFD && amount > 0 && amount <= selectedFD.totalValue && (
+          {selectedFD && amount > 0 && amount <= currentValue && (
             <div className="bg-blue-50 border rounded-xl p-4 text-sm">
               <p>
                 <b>Remaining FD Value:</b> ₹{formatINR(remainingValue)}
@@ -452,6 +470,7 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
               )}
             </div>
           )}
+
 
           {/* CONFIRM */}
           {selectedFD && amount > 0 && (
@@ -469,11 +488,10 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
           <button
             type="submit"
             disabled={isLoading || !confirm}
-            className={`w-full mt-2 font-semibold py-3 rounded-xl transition ${
-              isLoading
+            className={`w-full mt-2 font-semibold py-3 rounded-xl transition ${isLoading
                 ? "bg-red-400 text-white cursor-not-allowed"
                 : "bg-red-600 text-white hover:bg-red-700"
-            }`}
+              }`}
           >
             {isLoading ? "Processing..." : "Withdraw Amount"}
           </button>

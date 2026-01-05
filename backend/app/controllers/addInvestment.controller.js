@@ -389,7 +389,9 @@ export const editFDInvestment = async (req, res) => {
     }
 
     fd.investedValue = Number(investedValue);
+    fd.investedAtBeginning=Number(investedValue);
     fd.date = date;
+    fd.investedDate=date;
 
     await fd.save();
 

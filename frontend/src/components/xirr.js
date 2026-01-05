@@ -1,108 +1,6 @@
-// function daysBetween(date1, date2) {
-//   return (new Date(date2) - new Date(date1)) / (1000 * 60 * 60 * 24);
-// }
-
-// function calculateXIRR(cashflows, dates, guess = 0.1) {
-//   if (cashflows.length !== dates.length)
-//     throw new Error("Cashflows and dates must have same length");
-
-//   const maxIter = 100;
-//   const tol = 1e-6;
-//   const parsedDates = dates.map((d) => new Date(d));
-//   const baseDate = parsedDates[0];
-
-//   const f = (rate) =>
-//     cashflows.reduce(
-//       (acc, cf, i) =>
-//         acc + cf / Math.pow(1 + rate, daysBetween(baseDate, parsedDates[i]) / 365),
-//       0
-//     );
-
-//   const fPrime = (rate) =>
-//     cashflows.reduce((acc, cf, i) => {
-//       const t = daysBetween(baseDate, parsedDates[i]) / 365;
-//       return acc - (t * cf) / Math.pow(1 + rate, t + 1);
-//     }, 0);
-
-//   let rate = guess;
-//   for (let i = 0; i < maxIter; i++) {
-//     const newRate = rate - f(rate) / fPrime(rate);
-//     if (Math.abs(newRate - rate) < tol) return rate * 100; // Return %
-//     rate = newRate;
-//   }
-
-//   return rate * 100;
-// }
-
-// // ---------- Main AMC XIRR Function ----------
-// export default function calculateClientXIRR(client) {
-//     console.log(client);
-//   if (!client?.MFInvestments?.length || !client?.MFPeriodicInterest?.length)
-//     return 0;
-
-//   // 1️⃣ Identify last return date
-//   const lastReturn = client.MFPeriodicInterest.reduce((latest, curr) =>
-//     new Date(curr.endMonth) > new Date(latest.endMonth) ? curr : latest
-//   );
-//   const lastReturnDate = lastReturn.endMonth;
-
-//   // 2️⃣ Collect all investments (outflows)
-//   const cashflows = [];
-//   const dates = [];
-
-//   for (const inv of client.MFInvestments) {
-//     if (new Date(inv.date) <= new Date(lastReturnDate)) {
-//       cashflows.push(-Number(inv.investedValue));
-//       dates.push(inv.date);
-//     }
-//   }
-
-//   // 3️⃣ Collect all periodic returns (inflows)
-//   for (const period of client.MFPeriodicInterest) {
-//     if (new Date(period.endMonth).getTime() === new Date(lastReturnDate).getTime()) {
-//       cashflows.push(Number(period.totalValue));
-//       dates.push(period.endMonth);
-//     }
-//     else {
-//         cashflows.push(Number(period.returns));
-//       dates.push(period.endMonth);
-//     }
-//   }
-
-//   // 4️⃣ Sort by date
-//   const sorted = cashflows
-//     .map((cf, i) => ({ cf, date: new Date(dates[i]) }))
-//     .sort((a, b) => a.date - b.date);
-
-//   const sortedCF = sorted.map((x) => x.cf);
-//   const sortedDates = sorted.map((x) => x.date.toISOString().split("T")[0]);
-
-//   // 5️⃣ Compute XIRR
-//   const xirr = calculateXIRR(sortedCF, sortedDates);
-//   return xirr.toFixed(2);
-// }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function daysBetween(date1, date2) {
-  return (new Date(date2) - new Date(date1)) / (1000 * 60 * 60 * 24);
-}
 
 function calculateXIRR(cashflows, dates, guess = 0.1) {
   const maxIter = 100;
@@ -191,3 +89,17 @@ export default function calculateClientXIRR(client) {
   const xirr = calculateXIRR(sortedCF, sortedDates);
   return Number.isFinite(xirr) ? xirr.toFixed(2) : 0;
 }
+
+
+
+
+function normalizeDate(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function daysBetween(d1, d2) {
+  return (normalizeDate(d2) - normalizeDate(d1)) / (1000 * 60 * 60 * 24);
+}
+

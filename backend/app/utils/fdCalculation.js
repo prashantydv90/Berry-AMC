@@ -21,8 +21,10 @@ export const updateFDs = async () => {
         }
 
         // Calculate difference in days
-        const diffTime = now - fdDate; // milliseconds
-        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        const s=normalizeDate(fdDate);
+        const e=normalizeDate(now)
+        const diffTime = e - s; // milliseconds
+        const diffDays = (diffTime / (1000 * 60 * 60 * 24)) ;
         const yearsElapsed = diffDays / 365;
 
         // Approximate months for rate calculation
@@ -77,4 +79,11 @@ function getFdRate(months) {
   if (months <= 9) return 14;
   if (months <= 12) return 16;
   return 18;
+}
+
+
+function normalizeDate(d) {
+  const date = new Date(d);
+  date.setHours(0, 0, 0, 0);
+  return date;
 }

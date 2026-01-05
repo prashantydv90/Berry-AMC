@@ -247,9 +247,41 @@ export const projectFDReturns = (fd) => {
 
 
 
+// function getFdRate(months) {
+//   if (months <= 6) return 12;
+//   if (months <= 9) return 14;
+//   if (months <= 12) return 16;
+//   return 18;
+// }
+
+
+
 function getFdRate(months) {
   if (months <= 6) return 12;
   if (months <= 9) return 14;
   if (months <= 12) return 16;
   return 18;
 }
+
+
+
+export const calculateFDValue = (principal, startDate, endDate)=> {
+  const e=normalizeDate(endDate);
+  const s=normalizeDate(startDate);
+  const diffMs = e-s;
+  const days = diffMs / (1000 * 60 * 60 * 24);
+  const years = days / 365;
+  const months = days / 30;
+
+  const rate = getFdRate(months);
+  const value = principal * Math.pow(1 + rate / 100, years);
+
+  return { value, rate };
+}
+
+function normalizeDate(d) {
+  const date = new Date(d);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
