@@ -20,10 +20,14 @@ export const addInterest = async (req, res) => {
         success: false,
       });
     }
-    const lastInterest = await AddInterest.findOne({ client: clientId })
-      .sort({ endMonth: -1 });
-    
-    if (lastInterest && new Date(lastInterest.endMonth) > new Date(startMonth)) {
+    const lastInterest = await AddInterest.findOne({ client: clientId }).sort({
+      endMonth: -1,
+    });
+
+    if (
+      lastInterest &&
+      new Date(lastInterest.endMonth) > new Date(startMonth)
+    ) {
       return res.status(400).json({
         message: "Invalid Date",
         success: false,
@@ -48,17 +52,27 @@ export const addInterest = async (req, res) => {
       },
     });
 
-    let totalInvestmentValue=0;
+    let totalInvestmentValue = 0;
     if (investmentsInPeriod.length > 0) {
       totalInvestmentValue = investmentsInPeriod.reduce(
-      (sum, inv) => sum + Number(inv.investedValue || 0),
-      0
-    ); 
+        (sum, inv) => sum + Number(inv.investedValue || 0),
+        0
+      );
     }
 
-      // latest return
+    // latest return
 
-    const lastReturnTotal = lastInterest ? Number(lastInterest.totalValue) : 0;
+    // ✅ Get all previous returns strictly before this period
+    const previousReturns = await AddInterest.find({
+      client: clientId,
+      endMonth: { $lt: new Date(startMonth) },
+    });
+
+    // ✅ Sum all previous returns
+    const lastReturnTotal = previousReturns.reduce(
+      (sum, ret) => sum + Number(ret.returns || 0),
+      0
+    );
 
     // ✅ Compute totalValue = (last return’s totalValue) + (sum of investments in period) + (returns)
     const finalTotalValue =
@@ -76,7 +90,7 @@ export const addInterest = async (req, res) => {
     // ✅ Link this interest to the client record
     client.MFPeriodicInterest.push(newInterest._id);
     client.MFTotalValue = Number(client.MFTotalValue) + Number(returns);
-    client.MFReturns=Number(client.MFReturns) + Number(returns);
+    client.MFReturns = Number(client.MFReturns) + Number(returns);
     await client.save();
 
     return res.status(201).json({
@@ -93,8 +107,6 @@ export const addInterest = async (req, res) => {
     });
   }
 };
-
-
 
 export const editReturn = async (req, res) => {
   try {
@@ -134,8 +146,9 @@ export const editReturn = async (req, res) => {
     }
 
     // ✅ Ensure this is the latest return (only last one can be edited)
-    const latestReturn = await AddInterest.findOne({ client: client._id })
-      .sort({ endMonth: -1 });
+    const latestReturn = await AddInterest.findOne({ client: client._id }).sort(
+      { endMonth: -1 }
+    );
     if (latestReturn._id.toString() !== id) {
       return res.status(400).json({
         message: "Only the latest return can be edited",
@@ -147,8 +160,7 @@ export const editReturn = async (req, res) => {
     const previousInterest = await AddInterest.findOne({
       client: client._id,
       _id: { $ne: id },
-    })
-      .sort({ endMonth: -1 });
+    }).sort({ endMonth: -1 });
 
     if (
       previousInterest &&
@@ -188,7 +200,7 @@ export const editReturn = async (req, res) => {
     const oldReturnValue = Number(returnRecord.returns || 0);
     const diff = newReturnValue - oldReturnValue;
     client.MFTotalValue = Number(client.MFTotalValue) + diff;
-    client.MFReturns= Number(client.MFReturns) + diff;
+    client.MFReturns = Number(client.MFReturns) + diff;
 
     // ✅ Update the return record
     returnRecord.startMonth = startMonth;
@@ -213,9 +225,6 @@ export const editReturn = async (req, res) => {
     });
   }
 };
-
-
-
 
 export const deleteInterest = async (req, res) => {
   try {
