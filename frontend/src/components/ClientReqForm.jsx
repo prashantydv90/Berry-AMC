@@ -42,7 +42,7 @@ export const ClientRequestForm = ({ onClose }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5555/api/client-req", formData);
+      await axios.post("https://berry-amc.onrender.com/api/client-req", formData);
       setSuccess(true); // ✅ Show success popup
       setFormData({ name: "", phone: "", email: "", address: "", PAN: "" });
     } catch (error) {
