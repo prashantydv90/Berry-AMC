@@ -12,10 +12,11 @@ import { updateFDs } from "./app/utils/fdCalculation.js";
 import cookieParser from "cookie-parser";
 import contactUsRouter from "./app/routers/contactUs.routes.js";
 import withdrawRouter from "./app/routers/withdraw.routes.js";
+import { startBuybackCron } from "./app/cron/buyback.cron.js";
+import buybackRouter from "./app/routers/market/buyback.routes.js";
 
 dotenv.config();
 
-console.log(process.env.EMAIL_USER)
 const app=express();
 app.use(express.json())
 app.use(cookieParser());
@@ -33,6 +34,7 @@ app.use('/api',investmentRouter);
 app.use('/api',interestRouter);
 app.use('/api',contactUsRouter);
 app.use('/api',withdrawRouter);
+app.use('/api',buybackRouter)
 
 app.get("/ping", (req, res) => {
   res.status(200).send("alive");
@@ -50,6 +52,7 @@ mongoose.connect(process.env.MONGO_URL).then(()=>{
     app.listen(process.env.PORT || 2223,()=>{
         console.log("server listen on PORT",process.env.PORT || 5556);
     })
+    startBuybackCron();
 }).catch((err)=>{
     console.log("mongo connection error",err);
 })
