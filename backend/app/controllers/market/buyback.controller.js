@@ -28,7 +28,7 @@ const API_URL =
 
 export async function fetchAnnouncements() {
   console.log("Fetching cookies...");
-  await client.get(HOME_URL);
+  // await client.get(HOME_URL);
 
   console.log("Fetching announcements...");
   const { data } = await client.get(API_URL);

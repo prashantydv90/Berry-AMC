@@ -18,7 +18,7 @@ export const NavBar = () => {
 
   const { user, setUser } = useUser();
   const handleLogout = () => {
-    axios.get('https://berry-amc-0kaq.onrender.com/api/logout', { withCredentials: true }).then((res) => {
+    axios.get('http://localhost:5555/api/logout', { withCredentials: true }).then((res) => {
       console.log(res);
       setUser(null);
       toast.success(res.data.message)

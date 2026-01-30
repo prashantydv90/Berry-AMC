@@ -57,7 +57,7 @@
 //       setIsLoading(true);
 
 //       await axios.post(
-//         `https://berry-amc-0kaq.onrender.com/api/fdwithdraw/${selectedFD._id}`,
+//         `http://localhost:5555/api/fdwithdraw/${selectedFD._id}`,
 //         { amount }, { withCredentials: true }
 //       );
 
@@ -309,7 +309,7 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
       setIsLoading(true);
 
       await axios.post(
-        `https://berry-amc-0kaq.onrender.com/api/fdwithdraw/${selectedFD._id}`,
+        `http://localhost:5555/api/fdwithdraw/${selectedFD._id}`,
         {
           amount: Number(amount),
           date: withdrawDate,
