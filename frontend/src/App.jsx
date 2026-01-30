@@ -22,7 +22,8 @@ import { ResetPassword } from './components/ResetPassword'
 import NProgress from './components/progressBar'
 import "./index.css";
 import ScrollToTop from './components/ScrollToTop'
-import BuybackTable from './components/Market/buyback'
+import { Buyback } from './components/Market/Buyback'
+
 
 
 
@@ -61,7 +62,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        <Route path="/market/buyback" element={<BuybackTable />} />
+        <Route path="/market/buyback" element={<Buyback/>} />
 
       </Routes>
     </>

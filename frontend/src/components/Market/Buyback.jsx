@@ -12,7 +12,7 @@ import {
 
 const API_BASE = "https://berry-amc-0kaq.onrender.com/api/buybacks";
 
-export default function BuybackTable() {
+export const Buyback = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
