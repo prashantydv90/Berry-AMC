@@ -32,6 +32,7 @@ export async function fetchAnnouncements() {
 
   console.log("Fetching announcements...");
   const { data } = await client.get(API_URL);
+  console.log(data);
 
   if (!Array.isArray(data)) {
     console.log("Unexpected response");
