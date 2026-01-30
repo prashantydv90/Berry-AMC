@@ -25,7 +25,7 @@ export const Login = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        'http://localhost:5555/api/login',
+        'https://berry-amc-0kaq.onrender.com/api/login',
         { email, password },
         { withCredentials: true }
       );

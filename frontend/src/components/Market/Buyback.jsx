@@ -10,7 +10,7 @@ import {
   ChevronRight
 } from "lucide-react"; // npm i lucide-react
 
-const API_BASE = "http://localhost:5555/api/buybacks";
+const API_BASE = "https://berry-amc-0kaq.onrender.com/api/buybacks";
 
 export const Buyback = () => {
   const [data, setData] = useState([]);

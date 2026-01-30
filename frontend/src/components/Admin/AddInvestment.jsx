@@ -58,7 +58,7 @@ export const AddInvestmentForm = ({ setInvestmentForm, client, investmentType })
     try {
       setIsLoading(true); // <-- show "Adding..."
       const res = await axios.post(
-        `http://localhost:5555/api/addinvestment/${investmentType}`,
+        `https://berry-amc-0kaq.onrender.com/api/addinvestment/${investmentType}`,
         formData,
         { withCredentials: true }
       );

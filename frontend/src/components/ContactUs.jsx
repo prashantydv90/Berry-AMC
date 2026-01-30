@@ -36,7 +36,7 @@ export const ContactForm = () => {
     e.preventDefault();
     setLoading(true); // ✅ Start loading
     try {
-      const res = await axios.post("http://localhost:5555/api/contact", formData);
+      const res = await axios.post("https://berry-amc-0kaq.onrender.com/api/contact", formData);
       toast.success(res.data.message);
       setFormData({ name: "", phone: "", email: "", message: "" });
     } catch (error) {
