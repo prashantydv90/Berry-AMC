@@ -5,7 +5,7 @@ import { fetchAnnouncements } from "../controllers/market/buyback.controller.js"
 
 export function startBuybackCron() {
   // Runs every 3 minutes
-  cron.schedule("*/1 * * * *", async () => {
+  cron.schedule("*/3 * * * *", async () => {
     console.log(
       `[CRON] Buyback fetch started at ${new Date().toISOString()}`
     );
