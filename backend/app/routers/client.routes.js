@@ -6,6 +6,6 @@ const clientRouter=express.Router();
 
 clientRouter.route('/addClient').post(isAuthenticated, isAdmin,addClient);
 clientRouter.route('/getClientDetails').get(isAuthenticated, isAdmin,getClientDetails);
-clientRouter.route('/get1ClientDetails/:id').get(isAuthenticated, isAdmin,get1ClientDetails);
+clientRouter.route('/get1ClientDetails/:id').get(isAuthenticated,get1ClientDetails);
 
 export default clientRouter;
