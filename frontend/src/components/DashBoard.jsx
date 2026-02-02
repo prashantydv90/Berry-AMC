@@ -79,9 +79,7 @@ export const DashBoard = () => {
             if (!user) return;
             try {
                 setLoading(true);
-                const res = await axios.get(
-                    `https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${user.clientId}`
-                );
+                const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${user.clientId}`, { withCredentials: true });
                 setClient(res.data.data || null);
             } catch (err) {
                 setError(err.message || "Error fetching client");
