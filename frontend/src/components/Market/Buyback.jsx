@@ -11,7 +11,7 @@ import {
 } from "lucide-react"; // npm i lucide-react
 
 const API_BASE = "https://berry-amc-0kaq.onrender.com/api/buybacks";
-
+// px-3 md:px-9 pt-28 pb-10
 export const Buyback = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,12 +52,12 @@ export const Buyback = () => {
 
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <NavBar />
+    <div className=" bg-[#F8FAFC] px-1.5 pt-1">
+      {/* <NavBar /> */}
 
-      <div className="mx-auto max-w-7xl px-3 md:px-9 pt-28 pb-10">
+      <div className="mx-auto  ">
         {/* Header Area */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 px-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 px-1">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
               Buyback Updates

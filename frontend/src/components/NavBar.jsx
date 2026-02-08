@@ -75,6 +75,15 @@ export const NavBar = () => {
         </NavLink>
 
         <NavLink
+          to="/market"
+          className={({ isActive }) =>
+            isActive ? "text-blue-600" : "hover:text-blue-600"
+          }
+        >
+          Market
+        </NavLink>
+
+        <NavLink
           to="/contact-us"
           className={({ isActive }) =>
             isActive ? "text-blue-600" : "hover:text-blue-600"
@@ -153,6 +162,7 @@ export const NavBar = () => {
           <Link to="/" className="hover:text-blue-600 font-medium py-2 text-gray-700">Home</Link>
           <Link to="/services" className="hover:text-blue-600 font-medium py-2 text-gray-700">Our Services</Link>
           <Link to="/user-dashboard" className="hover:text-blue-600 font-medium py-2 text-gray-700">Dashboard</Link>
+          <Link to="/user-dashboard" className="hover:text-blue-600 font-medium py-2 text-gray-700">Market</Link>
           <Link to="/contact-us" className="hover:text-blue-600 font-medium py-2 text-gray-700">Contact Us</Link>
 
           {!user ? (

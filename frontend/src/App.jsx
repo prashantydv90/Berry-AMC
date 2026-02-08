@@ -9,7 +9,7 @@ import { DashBoard } from './components/DashBoard'
 import { AdminHome } from './components/Admin/AdminHome'
 import { ClientDetails } from './components/Admin/ClientDetails'
 import { Services } from './components/Services'
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation,Navigate  } from "react-router-dom";
 import { Login } from './components/Login'
 import { Signup } from './components/Signup'
 import { AddClientForm } from './components/Admin/AddClient'
@@ -23,6 +23,8 @@ import NProgress from './components/progressBar'
 import "./index.css";
 import ScrollToTop from './components/ScrollToTop'
 import { Buyback } from './components/Market/Buyback'
+import { Market } from './components/Market/Market'
+import { Ipo } from './components/Market/Ipo'
 
 
 
@@ -62,7 +64,14 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        <Route path="/market/buyback" element={<Buyback/>} />
+        {/* <Route path="/market/buybac" element={<Buyback/>} /> */}
+
+        <Route path="/market" element={<Market />}>
+          {/* default section */}
+          <Route index element={<Navigate to="buyback" replace />} />
+          <Route path="buyback" element={<Buyback />} />
+          <Route path="ipo" element={<Ipo />} />
+        </Route>
 
       </Routes>
     </>
