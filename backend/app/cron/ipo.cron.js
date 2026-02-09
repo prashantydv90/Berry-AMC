@@ -71,7 +71,7 @@ export const startIpoCron = () => {
             priceBand: ipo.issuePrice,
             issueSize: Number(ipo.issueSize) || 0,
             overallSubscription: "--",
-            status: "Upcoming",
+            status,
           },
           {
             upsert: true,
