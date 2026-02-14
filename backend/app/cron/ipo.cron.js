@@ -138,7 +138,7 @@ const mapStatus = (startDate, endDate) => {
 const fetchIPOData = async (retries = 3) => {
   try {
     // Step 1: Establish session cookies
-    await axiosInstance.get(NSE_HOME);
+    // await axiosInstance.get(NSE_HOME);
 
     // Step 2: Fetch actual IPO data
     const response = await axiosInstance.get(NSE_URL);
