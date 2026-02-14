@@ -33,7 +33,7 @@ const mapStatus = (startDate, endDate) => {
 /* ================= CRON FUNCTION ================= */
 export const startIpoCron = () => {
   // Runs every 5 hours
-  cron.schedule("*/1 * * * *", async () => {
+  cron.schedule("0 */1 * * *", async () => {
     console.log(
       `[CRON] IPO fetch started at ${new Date().toISOString()}`
     );
