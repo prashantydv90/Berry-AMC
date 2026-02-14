@@ -159,7 +159,7 @@ const fetchIPOData = async (retries = 3) => {
 /* ================= CRON FUNCTION ================= */
 
 export const startIpoCron = () => {
-  cron.schedule("0 */5 * * *", async () => {
+  cron.schedule("*/1 * * * *", async () => {
     const startTime = Date.now();
 
     console.log(
