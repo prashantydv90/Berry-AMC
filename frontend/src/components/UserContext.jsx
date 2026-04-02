@@ -8,7 +8,7 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:5555/api/check-auth', { withCredentials: true })
+    axios.get('https://berry-amc-0kaq.onrender.com/api/check-auth', { withCredentials: true })
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));  // 👈 important

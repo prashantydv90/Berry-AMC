@@ -33,7 +33,7 @@ export const Ipo = () => {
       setError(null);
 
       try {
-        const res = await axios.get(`http://localhost:5555${API_MAP[activeStatus]}`);
+        const res = await axios.get(`https://berry-amc-0kaq.onrender.com${API_MAP[activeStatus]}`);
         console.log(res)
         setData((prev) => ({
           ...prev,

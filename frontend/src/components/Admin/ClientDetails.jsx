@@ -50,7 +50,7 @@ export const ClientDetails = () => {
         const fetchClient = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${id}`, { withCredentials: true });
+                const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${id}`, { withCredentials: true });
                 setClient(res.data.data || null);
             } catch (err) {
                 setError(err.message || "Error fetching client");
@@ -99,12 +99,12 @@ export const ClientDetails = () => {
         try {
             setLoading(true); // Start loading
 
-            const url = `http://localhost:5555/api/deleteinvestment/${type}/${id}`;
+            const url = `https://berry-amc-0kaq.onrender.com/api/deleteinvestment/${type}/${id}`;
             await axios.delete(url, { withCredentials: true });
 
             // Refresh client data
             const res = await axios.get(
-                `http://localhost:5555/api/get1ClientDetails/${client._id}`,
+                `https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${client._id}`,
                 { withCredentials: true }
             );
             setClient(res.data.data);
@@ -121,10 +121,10 @@ export const ClientDetails = () => {
 
         try {
             setLoading(true);
-            const url = `http://localhost:5555/api/deleteinterest/${id}`;
+            const url = `https://berry-amc-0kaq.onrender.com/api/deleteinterest/${id}`;
             await axios.delete(url, { withCredentials: true });
             // Refresh client data
-            const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${client._id}`, { withCredentials: true });
+            const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${client._id}`, { withCredentials: true });
             setClient(res.data.data);
         } catch (err) {
             console.error("Error deleting investment:", err);
@@ -151,9 +151,9 @@ export const ClientDetails = () => {
         setLoading(true);
 
         try {
-            const url = `http://localhost:5555/api/resetInvestment/${investmentType}/${id}`;
+            const url = `https://berry-amc-0kaq.onrender.com/api/resetInvestment/${investmentType}/${id}`;
             await axios.delete(url, { withCredentials: true });
-            const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${client._id}`, { withCredentials: true });
+            const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${client._id}`, { withCredentials: true });
             toast.success("All investments and returns removed successfully!");
             setClient(res.data.data);
         } catch (err) {

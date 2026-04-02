@@ -12,7 +12,7 @@ export const IpoDetail = () => {
     const fetchIpo = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5555/api/ipos/${id}`
+          `https://berry-amc-0kaq.onrender.com/api/ipos/${id}`
         );
         setIpo(res.data.data);
       } catch (err) {

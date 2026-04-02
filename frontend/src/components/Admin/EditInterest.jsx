@@ -21,7 +21,7 @@ export const EditInterestForm = ({ setEditInterestForm, interest, refreshData })
     try {
         setIsLoading(true);
       const res = await axios.put(
-        `http://localhost:5555/api/editinterest/${interest._id}`,
+        `https://berry-amc-0kaq.onrender.com/api/editinterest/${interest._id}`,
         formData,
         { withCredentials: true }
       );

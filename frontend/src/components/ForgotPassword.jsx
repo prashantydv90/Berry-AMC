@@ -14,7 +14,7 @@ export const ForgotPassword = () => {
     if (!email.trim()) return toast.warning("Please enter your email");
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5555/api/forgot-password", { email });
+      const res = await axios.post("https://berry-amc-0kaq.onrender.com/api/forgot-password", { email });
       toast.success(res.data.message);
       setTimeout(() => navigate("/reset-password", { state: { email } }), 1000);
     } catch (err) {

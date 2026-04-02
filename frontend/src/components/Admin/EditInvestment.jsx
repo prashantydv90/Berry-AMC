@@ -57,7 +57,7 @@ export const EditInvestmentForm = ({
       setIsLoading(true);
 
       const res = await axios.put(
-        `http://localhost:5555/api/editinvestment/${investmentType}/${investment._id}`,
+        `https://berry-amc-0kaq.onrender.com/api/editinvestment/${investmentType}/${investment._id}`,
         formData,
         { withCredentials: true }
       );

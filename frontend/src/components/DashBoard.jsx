@@ -60,7 +60,7 @@ export const DashBoard = () => {
             try {
                 setLoading(true);
                 const res = await axios.get(
-                    `http://localhost:5555/api/getuserdetails/${user.userId}`
+                    `https://berry-amc-0kaq.onrender.com/api/getuserdetails/${user.userId}`
                     , { withCredentials: true });
                 setUser(prev => ({
                     ...prev,
@@ -81,7 +81,7 @@ export const DashBoard = () => {
             if (!user) return;
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${user.clientId}`, { withCredentials: true });
+                const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${user.clientId}`, { withCredentials: true });
                 setClient(res.data.data || null);
             } catch (err) {
                 setError(err.message || "Error fetching client");

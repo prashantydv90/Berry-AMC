@@ -22,7 +22,7 @@ export const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5555/api/reset-password", {
+      const res = await axios.post("https://berry-amc-0kaq.onrender.com/api/reset-password", {
         email,
         otp,
         newPassword,

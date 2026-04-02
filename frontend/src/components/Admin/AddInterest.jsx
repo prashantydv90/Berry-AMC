@@ -23,7 +23,7 @@ export const AddInterestForm = ({ setInterestForm, client }) => {
     setIsLoading(true);
     try {
       const res = await axios.post(
-        `http://localhost:5555/api/addinterest/${client._id}`,
+        `https://berry-amc-0kaq.onrender.com/api/addinterest/${client._id}`,
         formData,
         { withCredentials: true }
       );

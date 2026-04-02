@@ -19,7 +19,7 @@ const ClientRequestsPage = () => {
 
   const fetchRequests = async () => {
     try {
-      const res = await axios.get("http://localhost:5555/api/getclientreqs", { withCredentials: true });
+      const res = await axios.get("https://berry-amc-0kaq.onrender.com/api/getclientreqs", { withCredentials: true });
       setRequests(res.data.data || []);
     } catch (error) {
       console.error("Error fetching client requests:", error);
@@ -43,7 +43,7 @@ const ClientRequestsPage = () => {
     try {
       if (actionType === "approve") {
         const res = await axios.post(
-          "http://localhost:5555/api/addClient",
+          "https://berry-amc-0kaq.onrender.com/api/addClient",
           selectedReq,
           { withCredentials: true }
         );
@@ -53,7 +53,7 @@ const ClientRequestsPage = () => {
       }
 
       await axios.delete(
-        `http://localhost:5555/api/deletereq/${selectedReq._id}`,
+        `https://berry-amc-0kaq.onrender.com/api/deletereq/${selectedReq._id}`,
         { withCredentials: true }
       );
 
