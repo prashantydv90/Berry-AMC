@@ -34,7 +34,7 @@ export const Signup = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('https://berry-amc-0kaq.onrender.com/api/signup', form);
+      const res = await axios.post('http://localhost:5555/api/signup', form);
       if (res.data.success) {
         setOtpSent(true);
         toast.success(res.data.message);
@@ -55,7 +55,7 @@ export const Signup = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        'https://berry-amc-0kaq.onrender.com/api/signup/verify-otp',
+        'http://localhost:5555/api/signup/verify-otp',
         { email: form.email, otp }
       );
 
@@ -94,7 +94,7 @@ export const Signup = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        'https://berry-amc-0kaq.onrender.com/api/login',
+        'http://localhost:5555/api/login',
         { email, password },
         { withCredentials: true }
       );

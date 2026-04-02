@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IdCard, User, Home, Phone, Mail, Wallet, TrendingUp, CircleDollarSign, Calendar, Edit2, Trash2, CalendarDays, PiggyBank, IndianRupee, LineChart, ChevronDown } from "lucide-react";
+import { IdCard, User, Home, Phone, Mail, Wallet, TrendingUp, CircleDollarSign, Calendar, Edit2, Trash2, CalendarDays, PiggyBank, IndianRupee, LineChart, ChevronDown,BarChart3  } from "lucide-react";
 import { NavBar } from "../NavBar";
 import { AddInterestForm } from "./AddInterest";
 import { AddInvestmentForm } from "./AddInvestment";
@@ -50,7 +50,7 @@ export const ClientDetails = () => {
         const fetchClient = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${id}`, { withCredentials: true });
+                const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${id}`, { withCredentials: true });
                 setClient(res.data.data || null);
             } catch (err) {
                 setError(err.message || "Error fetching client");
@@ -99,12 +99,12 @@ export const ClientDetails = () => {
         try {
             setLoading(true); // Start loading
 
-            const url = `https://berry-amc-0kaq.onrender.com/api/deleteinvestment/${type}/${id}`;
+            const url = `http://localhost:5555/api/deleteinvestment/${type}/${id}`;
             await axios.delete(url, { withCredentials: true });
 
             // Refresh client data
             const res = await axios.get(
-                `https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${client._id}`,
+                `http://localhost:5555/api/get1ClientDetails/${client._id}`,
                 { withCredentials: true }
             );
             setClient(res.data.data);
@@ -121,10 +121,10 @@ export const ClientDetails = () => {
 
         try {
             setLoading(true);
-            const url = `https://berry-amc-0kaq.onrender.com/api/deleteinterest/${id}`;
+            const url = `http://localhost:5555/api/deleteinterest/${id}`;
             await axios.delete(url, { withCredentials: true });
             // Refresh client data
-            const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${client._id}`, { withCredentials: true });
+            const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${client._id}`, { withCredentials: true });
             setClient(res.data.data);
         } catch (err) {
             console.error("Error deleting investment:", err);
@@ -151,9 +151,9 @@ export const ClientDetails = () => {
         setLoading(true);
 
         try {
-            const url = `https://berry-amc-0kaq.onrender.com/api/resetInvestment/${investmentType}/${id}`;
+            const url = `http://localhost:5555/api/resetInvestment/${investmentType}/${id}`;
             await axios.delete(url, { withCredentials: true });
-            const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${client._id}`, { withCredentials: true });
+            const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${client._id}`, { withCredentials: true });
             toast.success("All investments and returns removed successfully!");
             setClient(res.data.data);
         } catch (err) {
@@ -242,6 +242,10 @@ export const ClientDetails = () => {
                                 <span><b>Returns:</b> ₹{totalReturn} ({totalReturnPercent > 0 ? totalReturnPercent : "0"}%)</span>
                             </div>
 
+                            <div className="flex items-center gap-2 text-sm text-zinc-700">
+                                <BarChart3  className="w-4 h-4 text-red-600" /> <span><b>LT Returns:</b> ₹{investmentType=== "mf" ?toIndianFormat(Number(client?.MFLTReturns) || 0) : toIndianFormat(Number(client?.FDLTReturns) || 0)}</span>
+                            </div>
+
                             {investmentType === "mf" &&
                                 <>
                                     {/* <div className="flex items-center gap-2 text-sm text-zinc-700">
@@ -252,6 +256,7 @@ export const ClientDetails = () => {
                                         <LineChart className="w-4 h-4 text-indigo-600" />
                                         <span><b>XIRR:</b> {xirr ? `${xirr}%` : "0%"}</span>
                                     </div>
+                                    
                                 </>
                             }
 

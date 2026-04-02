@@ -58,10 +58,11 @@ export const updateFDs = async () => {
     // Update all clients once
     for (let { invested, value, client } of clientMap.values()) {
       try {
+        client.FDLTReturns = (Number(client.FDLTReturns) + Number(value) - Number(client.FDTotalValue)).toFixed(2);
         client.FDTotalInvested = invested.toFixed(2);
         client.FDTotalValue = value.toFixed(2);
         await client.save();
-        console.log(`✅ Client ${client._id} totals updated: FDTotalInvested=${client.FDTotalInvested}, FDTotalValue=${client.FDTotalValue}`);
+        console.log(`✅ Client ${client._id} totals updated: FDTotalInvested=${client.FDTotalInvested}, FDTotalValue=${client.FDTotalValue})`);
       } catch (err) {
         console.error(`❌ Error updating client ${client._id}:`, err.message);
       }

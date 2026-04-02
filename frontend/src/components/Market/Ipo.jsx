@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { formatDate } from "../utils";
+import { useNavigate } from "react-router-dom";
 
 /* ================= API MAP ================= */
 const API_MAP = {
@@ -32,7 +33,7 @@ export const Ipo = () => {
       setError(null);
 
       try {
-        const res = await axios.get(`https://berry-amc-0kaq.onrender.com${API_MAP[activeStatus]}`);
+        const res = await axios.get(`http://localhost:5555${API_MAP[activeStatus]}`);
         console.log(res)
         setData((prev) => ({
           ...prev,
@@ -109,6 +110,7 @@ const StatusPill = ({ label, active, onClick }) => {
 
 /* ================= TABLE ================= */
 const IPOTable = ({ ipos }) => {
+  const navigate=useNavigate();
   if (!ipos.length) {
     return (
       <div className="text-zinc-500 py-10 text-center">
@@ -149,7 +151,10 @@ const IPOTable = ({ ipos }) => {
               key={ipo._id}
               className="border-t border-zinc-200 hover:bg-zinc-50 transition"
             >
-              <td className="px-5 py-4 font-medium text-zinc-900">
+              <td
+                // onClick={() => navigate(`/market/ipo/${ipo._id}`)}
+                className="px-5 py-4 font-medium  "
+              >
                 {ipo.companyName}
               </td>
               <td className="px-5 py-4 text-zinc-700 ">
@@ -158,9 +163,15 @@ const IPOTable = ({ ipos }) => {
               <td className="px-5 py-4 text-zinc-700">
                 {formatDate(ipo.issueEndDate)}
               </td>
-              <td className="px-5 py-4 text-zinc-700">
-                {ipo.priceBand}
+              {ipo?.series==="DEBT" ? 
+              <td className="px-5 py-4 text-zinc-700 font-medium">
+                ₹{ipo?.priceBand?.slice(3)}
               </td>
+              :
+              <td className="px-5 py-4 text-zinc-700 font-medium">
+                ₹{ipo.lowerPrice} - ₹{ipo.upperPrice}
+              </td>
+              }
               <td className="px-5 py-4">
                 <span className="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-zinc-100 text-zinc-700">
                   {ipo.series}

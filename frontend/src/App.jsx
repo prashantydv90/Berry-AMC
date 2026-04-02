@@ -25,6 +25,8 @@ import ScrollToTop from './components/ScrollToTop'
 import { Buyback } from './components/Market/Buyback'
 import { Market } from './components/Market/Market'
 import { Ipo } from './components/Market/Ipo'
+import { IpoDetail } from './components/Market/IpoDetail'
+
 
 
 
@@ -64,13 +66,12 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* <Route path="/market/buybac" element={<Buyback/>} /> */}
-
         <Route path="/market" element={<Market />}>
           {/* default section */}
           <Route index element={<Navigate to="buyback" replace />} />
           <Route path="buyback" element={<Buyback />} />
           <Route path="ipo" element={<Ipo />} />
+          {/* <Route path="ipo/:id" element={<IpoDetail />} /> */}
         </Route>
 
       </Routes>

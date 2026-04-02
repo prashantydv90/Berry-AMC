@@ -7,7 +7,7 @@ const fetchByStatus = async (req, res, status) => {
     const ipos = await IPO.find({
       status,
     })
-      .sort({ issueStartDate: 1 }) // earliest first
+      .sort({ issueStartDate: -1 }) // earliest first
       .lean();
 
     return res.status(200).json({

@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { AiOutlineBank } from "react-icons/ai"; // icons for MF and FD
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import calculateClientXIRR from "./xirr";
 import MFInvestmentTable from "./MFInvestmentDetailsCard";
 import FDInvestmentTable from "./FDInvestmentDetails";
@@ -36,6 +36,8 @@ export const DashBoard = () => {
 
     const [totalReturn, setTotalReturn] = useState("");
     const [totalReturnPercent, setTotalReturnPercent] = useState("");
+
+    const [showTooltip, setShowTooltip] = useState(false);
 
     useEffect(() => {
         let XIRR = calculateClientXIRR(client);
@@ -58,7 +60,7 @@ export const DashBoard = () => {
             try {
                 setLoading(true);
                 const res = await axios.get(
-                    `https://berry-amc-0kaq.onrender.com/api/getuserdetails/${user.userId}`
+                    `http://localhost:5555/api/getuserdetails/${user.userId}`
                     , { withCredentials: true });
                 setUser(prev => ({
                     ...prev,
@@ -79,7 +81,7 @@ export const DashBoard = () => {
             if (!user) return;
             try {
                 setLoading(true);
-                const res = await axios.get(`https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${user.clientId}`, { withCredentials: true });
+                const res = await axios.get(`http://localhost:5555/api/get1ClientDetails/${user.clientId}`, { withCredentials: true });
                 setClient(res.data.data || null);
             } catch (err) {
                 setError(err.message || "Error fetching client");
@@ -355,21 +357,81 @@ export const DashBoard = () => {
 
                                 <div className="flex flex-row md:flex-col md:w-1/3 w-full">
                                     <div className="font-medium text-[15px] md:text-[13.5px] text-zinc-600 ml-auto">
-                                        Total returns
+                                        Total Returns
                                     </div>
                                     <div className="font-semibold flex flex-1 justify-end md:justify-start text-md ml-auto text-green-600">
                                         +₹{totalReturn} ({totalReturnPercent}%)
                                     </div>
                                 </div>
-                                {selected === "mf" &&
-                                    <div className="flex flex-row md:flex-col md:w-1/5 w-full ">
-                                        <div className="font-medium text-[15px] md:text-[13.5px] text-zinc-600 ml-auto">
-                                            XIRR
+                                {selected === "fd" &&
+                                    <div className="flex flex-row md:flex-col md:w-[23%] w-full relative">
+
+                                        {/* Label + Icon */}
+                                        <div className="flex items-center gap-1 ml-auto">
+                                            <span className="font-medium text-[15px] md:text-[13.5px] text-zinc-600">
+                                                LT Returns
+                                            </span>
+
+                                            <HelpCircle
+                                                size={14}
+                                                className="text-zinc-500 cursor-pointer"
+                                                onClick={() => setShowTooltip(prev => !prev)}
+                                            />
                                         </div>
-                                        <div className="font-semibold flex flex-1 justify-end md:justify-start text-md ml-auto text-green-600">
-                                            {xirr}%
+
+                                        {/* Value */}
+                                        <div className="font-semibold flex flex-1 justify-end md:justify-start text-md md:mr-4.5 ml-auto text-green-600">
+                                            ₹{toIndianFormat(Number(client?.FDLTReturns) || 0)}
                                         </div>
+
+                                        {/* Tooltip */}
+                                        {showTooltip && (
+                                            <div className="absolute -top-8 right-0 text-xs bg-black text-white px-2 py-1 rounded whitespace-nowrap">
+                                                Lifetime Returns in Fixed Deposit
+                                            </div>
+                                        )}
                                     </div>
+                                }
+
+
+                                {selected === "mf" &&
+                                    <>
+                                        <div className="flex flex-row md:flex-col md:w-[26%] w-full relative">
+
+                                            {/* Label + Icon */}
+                                            <div className="flex items-center gap-1 ml-auto">
+                                                <span className="font-medium text-[15px] md:text-[13.5px] text-zinc-600">
+                                                    LT Returns
+                                                </span>
+
+                                                <HelpCircle
+                                                    size={14}
+                                                    className="text-zinc-500 cursor-pointer"
+                                                    onClick={() => setShowTooltip(prev => !prev)}
+                                                />
+                                            </div>
+
+                                            {/* Value */}
+                                            <div className="font-semibold flex flex-1 justify-end md:justify-start text-md md:mr-4.5 ml-auto text-green-600">
+                                                ₹{toIndianFormat(Number(client?.MFLTReturns) || 0)}
+                                            </div>
+
+                                            {/* Tooltip */}
+                                            {showTooltip && (
+                                                <div className="absolute -top-8 right-0 text-xs bg-black text-white px-2 py-1 rounded whitespace-nowrap">
+                                                    Lifetime Returns in Mutual Fund
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-row md:flex-col md:w-10/55 w-full  ">
+                                            <div className="font-medium text-[15px] md:text-[13.5px] text-zinc-600 ml-auto">
+                                                XIRR
+                                            </div>
+                                            <div className="font-semibold flex flex-1 justify-end md:justify-start text-md ml-auto text-green-600">
+                                                {xirr}%
+                                            </div>
+                                        </div>
+                                    </>
                                 }
                             </div>
                         </div>

@@ -12,6 +12,8 @@ const clientSchema = new mongoose.Schema(
     MFReturns:{type:String, default: "0"},
     FDTotalInvested:{type:String,default:"0"},
     FDTotalValue:{type:String, default: "0"},
+    FDLTReturns:{type:String, default: "0"},
+    MFLTReturns:{type:String, default: "0"},
 
     MFPeriodicInterest:[
       {

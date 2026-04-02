@@ -56,7 +56,7 @@ export const MFWithdraw = ({ setWithdrawForm, client }) => {
   //     const newTotalValue = totalValue - withdrawalAmount;
 
   //     await axios.post(
-  //       "https://berry-amc-0kaq.onrender.com/api/addinvestment/mf", // or mftransaction
+  //       "http://localhost:5555/api/addinvestment/mf", // or mftransaction
   //       {
   //         clientId: client._id,
   //         investedValue: -withdrawalAmount,   // 🔴 negative
@@ -106,7 +106,7 @@ export const MFWithdraw = ({ setWithdrawForm, client }) => {
 
       // 🔴 FULL WITHDRAW → DELETE
       if (withdrawalAmount === totalValue) {
-        const url = `https://berry-amc-0kaq.onrender.com/api/resetInvestment/mf/${client._id}`;
+        const url = `http://localhost:5555/api/resetInvestment/mf/${client._id}`;
         await axios.delete(url, { withCredentials: true });
 
         toast.success("All Mutual Fund balance withdrawn");
@@ -116,7 +116,7 @@ export const MFWithdraw = ({ setWithdrawForm, client }) => {
         const newTotalValue = totalValue - withdrawalAmount;
 
         await axios.post(
-          "https://berry-amc-0kaq.onrender.com/api/addinvestment/mf",
+          "http://localhost:5555/api/addinvestment/mf",
           {
             clientId: client._id,
             investedValue: -withdrawalAmount,
@@ -131,7 +131,7 @@ export const MFWithdraw = ({ setWithdrawForm, client }) => {
 
       // 🔄 Refresh client data (MANDATORY)
       const res = await axios.get(
-        `https://berry-amc-0kaq.onrender.com/api/get1ClientDetails/${client._id}`,
+        `http://localhost:5555/api/get1ClientDetails/${client._id}`,
         { withCredentials: true }
       );
 

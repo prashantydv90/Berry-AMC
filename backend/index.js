@@ -18,6 +18,8 @@ import { startIpoCron } from "./app/cron/ipo.cron.js";
 import { startIpoStatusCron } from "./app/cron/ipoStatus.cron.js";
 import ipoRouter from "./app/routers/market/ipo.routes.js";
 
+
+
 dotenv.config();
 
 const app=express();

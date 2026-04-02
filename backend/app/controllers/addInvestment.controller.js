@@ -388,10 +388,18 @@ export const editFDInvestment = async (req, res) => {
       });
     }
 
+    client.FDLTReturns = Number(client.FDLTReturns) - Number(fd.totalValue) + Number(fd.investedValue);
+    client.FDTotalValue = Number(client.FDTotalValue) - Number(fd.totalValue) + Number(investedValue);
+    if(Number(client.FDLTReturns)<0) client.FDLTReturns=0;
+
     fd.investedValue = Number(investedValue);
     fd.investedAtBeginning=Number(investedValue);
     fd.date = date;
     fd.investedDate=date;
+
+    
+
+    await client.save();
 
     await fd.save();
 
@@ -428,6 +436,7 @@ export const deleteFDInvestment = async (req, res) => {
 
     const client = await Client.findById(investment.client);
     if (client) {
+      client.FDLTReturns = Number(client.FDLTReturns) - Number(investment.totalValue) + Number(investment.investedValue);
       client.FDTotalInvested -= Number(investment.investedValue);
       client.FDTotalValue -= Number(investment.totalValue);
       client.FDInvestments = client.FDInvestments.filter(
@@ -436,6 +445,7 @@ export const deleteFDInvestment = async (req, res) => {
       if (client.FDInvestments.length === 0) {
         client.FDTotalInvested = 0;
         client.FDTotalValue = 0;
+        client.FDLTReturns = 0;
       }
       await client.save();
     }

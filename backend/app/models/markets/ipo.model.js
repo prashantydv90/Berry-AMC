@@ -32,8 +32,13 @@ const ipoSchema = new mongoose.Schema(
       required: true,
     },
 
-    priceBand: {
-      type: String, // "₹857 – ₹900"
+    lowerPrice: {
+      type: Number, // "₹857 – ₹900"
+      required: true,
+    },
+
+    upperPrice: {
+      type: Number, // "₹857 – ₹900"
       required: true,
     },
 
@@ -53,11 +58,21 @@ const ipoSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    lotSize: {
+      type: Number,
+    },
 
+    minInvestment: {
+      type: Number,
+    },
+
+    maxInvestment: {
+      type: Number,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const IPO = mongoose.model("IPO", ipoSchema);

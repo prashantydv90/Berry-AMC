@@ -91,6 +91,7 @@ export const addInterest = async (req, res) => {
     client.MFPeriodicInterest.push(newInterest._id);
     client.MFTotalValue = Number(client.MFTotalValue) + Number(returns);
     client.MFReturns = Number(client.MFReturns) + Number(returns);
+    client.MFLTReturns = Number(client.MFLTReturns) + Number(returns);
     await client.save();
 
     return res.status(201).json({
@@ -201,6 +202,7 @@ export const editReturn = async (req, res) => {
     const diff = newReturnValue - oldReturnValue;
     client.MFTotalValue = Number(client.MFTotalValue) + diff;
     client.MFReturns = Number(client.MFReturns) + diff;
+    client.MFLTReturns = Number(client.MFLTReturns) + diff;
 
     // ✅ Update the return record
     returnRecord.startMonth = startMonth;
@@ -260,6 +262,8 @@ export const deleteInterest = async (req, res) => {
     if (client.MFTotalValue < 0) client.MFTotalValue = 0; // safety
     client.MFReturns -= Number(interest.returns || 0);
     if (client.MFReturns < 0) client.MFReturns = 0; // safety
+    client.MFLTReturns -= Number(interest.returns || 0);
+    if (client.MFLTReturns < 0) client.MFLTReturns = 0; // safety
 
     // ✅ Remove interest from client record
     client.MFPeriodicInterest = client.MFPeriodicInterest.filter(
