@@ -66,7 +66,7 @@ export default function MFInvestmentTable({ investments = [] }) {
                                         }`}
                                 >
 
-                                    {inv.investedValue && inv.investedValue<0 && <span>-</span>}₹{Number(Math.abs(inv.investedValue.toFixed(0)) || inv.invested.toFixed(0) || 0).toLocaleString("en-IN")}
+                                    {inv.investedValue && inv.investedValue<0 && <span>-</span>}₹{Number(Math.abs(inv?.investedValue) || inv?.invested || 0).toLocaleString("en-IN")}
                                 </td>
                                 <td className="w-1/3 px-5 py-3 text-gray-800 font-medium text-right">
                                     ₹{Number(inv.totalValue.toFixed(0)).toLocaleString("en-IN")}

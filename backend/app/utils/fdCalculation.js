@@ -3,7 +3,10 @@ import { FDInvestment } from "../models/fdInvestment.model.js";
 
 export const updateFDs = async () => {
   try {
-    const fds = await FDInvestment.find().populate("client");
+    // const fds = await FDInvestment.find().populate("client");
+    const fds = await FDInvestment.find({
+      status: "active",
+    }).populate("client");
     if (!fds.length) {
       console.log("No FDs found to update.");
       return;

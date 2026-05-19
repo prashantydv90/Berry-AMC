@@ -26,7 +26,7 @@ export const DashBoard = () => {
     const [openAnalyse, setOpenAnalyse] = useState(false);
     const [openForm, setOpenForm] = useState(false);
     const [selected, setSelected] = useState("mf");
-    const [selectedfd, setSelectedfd] = useState(0);
+    const [selectedfd, setSelectedfd] = useState(null);
     const [client, setClient] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -103,13 +103,86 @@ export const DashBoard = () => {
 
             setTotalReturn(toIndianFormat(returns));
             setTotalReturnPercent(((returns / invested) * 100).toFixed(2));
-        } else if (selected === "fd" && client?.FDInvestments?.[selectedfd]) {
-            const fd = client.FDInvestments[selectedfd];
+        } else if (
+  selected === "fd" &&
+  client?.FDInvestments?.find(
+    (fd) => fd._id === selectedfd
+  )
+) {
+            // const fd = client.FDInvestments[selectedfd];
+            const fd = client.FDInvestments.find(
+  (fd) => fd._id === selectedfd
+);
             const returns = fd.totalValue - fd.investedValue;
             setTotalReturn(toIndianFormat(returns.toFixed(2)));
             setTotalReturnPercent(((returns / fd.investedValue) * 100).toFixed(2));
         }
     }, [selected, selectedfd, client]);
+
+    // useEffect(() => {
+    //     if (!client?.FDInvestments || selected !== "fd") return;
+
+    //     const activeFDs = client.FDInvestments.filter(
+    //         (fd) => fd.status === "active"
+    //     );
+
+    //     // If only one FD exists overall
+    //     if (client.FDInvestments.length === 1) {
+    //         setSelectedfd(client.FDInvestments[0]._id);
+    //         return;
+    //     }
+
+    //     // If multiple FDs exist, auto-select first active FD
+    //     if (activeFDs.length > 0 && !selectedfd) {
+    //         setSelectedfd(activeFDs[0]._id);
+    //     }
+    // }, [client, selected]);
+    
+
+    useEffect(() => {
+  if (!client?.FDInvestments || selected !== "fd") return;
+
+  const activeFDs = client.FDInvestments.filter(
+    (fd) => fd.status === "active"
+  );
+
+  const closedFDs = client.FDInvestments.filter(
+    (fd) => fd.status === "closed"
+  );
+
+  // ACTIVE FD FLOW
+  if (activeFDs.length > 0) {
+
+    // Single active FD
+    if (activeFDs.length === 1) {
+      setSelectedfd(activeFDs[0]._id);
+      return;
+    }
+
+    // Multiple active FDs
+    if (!selectedfd) {
+      setSelectedfd(activeFDs[0]._id);
+    }
+
+    return;
+  }
+
+  // CLOSED FD FLOW
+  if (closedFDs.length > 0) {
+
+    // Single closed FD
+    if (closedFDs.length === 1) {
+      setSelectedfd(closedFDs[0]._id);
+      return;
+    }
+
+    // Multiple closed FDs
+    if (!selectedfd) {
+      setSelectedfd(closedFDs[0]._id);
+    }
+  }
+
+}, [client, selected]);
 
     // ---------- CONDITIONAL RENDERS ----------
     if (loading) {
@@ -263,7 +336,7 @@ export const DashBoard = () => {
                                 ))}
                             </select>
                         )} */}
-                        <div className="md:w-[60%] 2xl:w-[55%] w-[90%]">
+                        {/* <div className="md:w-[60%] 2xl:w-[55%] w-[90%]">
                             <div className="w-50">
                                 {selected === "fd" && client?.FDInvestments?.length > 1 && (
                                     <CustomDropdown
@@ -278,6 +351,30 @@ export const DashBoard = () => {
 
                                     />
                                 )}
+                            </div>
+                        </div> */}
+
+                        <div className="md:w-[60%] 2xl:w-[55%] w-[90%]">
+                            <div className="w-50">
+                                {selected === "fd" &&
+                                    client?.FDInvestments?.filter(
+  (fd) => fd.status === "active"
+).length > 1 && (
+                                        <CustomDropdown
+                                            label="Choose FD"
+                                            value={selectedfd}
+                                            onChange={(val) => setSelectedfd(val)}
+                                            options={client.FDInvestments
+                                                .filter((fd) => fd.status === "active")
+                                                .map((fd, index) => ({
+                                                    value: fd._id,
+                                                    label: `FD (${index + 1}) - ₹${toIndianFormat(
+                                                        fd.totalValue.toFixed(0)
+                                                    )}`,
+                                                    icon: <AiOutlineBank />,
+                                                }))}
+                                        />
+                                    )}
                             </div>
                         </div>
 
@@ -298,7 +395,10 @@ export const DashBoard = () => {
                                         {selected === "mf"
                                             ? toIndianFormat(Number(client?.MFTotalValue).toFixed(0))
                                             : toIndianFormat(
-                                                client?.FDInvestments[selectedfd].totalValue.toFixed(0)
+                                                // client?.FDInvestments[selectedfd].totalValue.toFixed(0)
+                                                client?.FDInvestments.find(
+  (fd) => fd._id === selectedfd
+)?.totalValue.toFixed(0)
                                             )}
                                     </div>
                                 </div>
@@ -324,7 +424,10 @@ export const DashBoard = () => {
                                         {selected === "mf"
                                             ? toIndianFormat(client?.MFTotalInvested)
                                             : toIndianFormat(
-                                                client?.FDInvestments[selectedfd].investedValue.toFixed(0)
+                                                // client?.FDInvestments[selectedfd].investedValue.toFixed(0)
+                                                client?.FDInvestments.find(
+  (fd) => fd._id === selectedfd
+)?.investedValue.toFixed(0)
                                             )}
                                     </div>
                                 </div>
@@ -350,7 +453,9 @@ export const DashBoard = () => {
                                                 })()}%)
                                             </>
                                         ) : (
-                                            `${client?.FDInvestments[selectedfd]?.rate.toFixed(2)}%`
+                                            `${client?.FDInvestments.find(
+  (fd) => fd._id === selectedfd
+)?.rate.toFixed(2)}%`
                                         )}
                                     </div>
                                 </div>
@@ -360,7 +465,9 @@ export const DashBoard = () => {
                                         Total Returns
                                     </div>
                                     <div className="font-semibold flex flex-1 justify-end md:justify-start text-md ml-auto text-green-600">
-                                        +₹{totalReturn} ({totalReturnPercent}%)
+                                        +₹{totalReturn} ({isNaN(Number(totalReturnPercent))
+    ? "0.00"
+    : totalReturnPercent}%)
                                     </div>
                                 </div>
                                 {selected === "fd" &&

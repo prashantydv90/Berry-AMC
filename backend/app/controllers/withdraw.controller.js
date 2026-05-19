@@ -30,7 +30,6 @@ export const withdrawFD = async (req, res) => {
       });
     }
 
-    
     if (amount > fdValueAtWithdrawal) {
       await session.abortTransaction();
       return res.status(400).json({
@@ -47,10 +46,10 @@ export const withdrawFD = async (req, res) => {
         message: "Client not found",
       });
     }
-    
-    client.FDTotalValue-=fd.totalValue;
+
+    client.FDTotalValue -= fd.totalValue;
     fd.totalValue = fdValueAtWithdrawal;
-    client.FDTotalValue+=fd.totalValue;
+    client.FDTotalValue += fd.totalValue;
 
     // 1️⃣ Create withdrawal record
     const [withdraw] = await FDWithdraw.create(
@@ -62,7 +61,7 @@ export const withdrawFD = async (req, res) => {
           withdrawalDate: date,
         },
       ],
-      { session }
+      { session },
     );
 
     // 2️⃣ PARTIAL WITHDRAWAL
@@ -85,37 +84,62 @@ export const withdrawFD = async (req, res) => {
     }
 
     // 3️⃣ FULL WITHDRAWAL (FD CLOSE)
-    else {
-      // Remove all withdrawals
-      await FDWithdraw.deleteMany({ fd: fd._id }).session(session);
+    // else {
+    //   // Remove all withdrawals
+    //   await FDWithdraw.deleteMany({ fd: fd._id }).session(session);
 
+    //   // Update client totals
+    //   client.FDTotalValue -= fd.totalValue;
+    //   client.FDTotalInvested -= fd.investedValue;
+    //   if (client.FDTotalInvested < 1) {
+    //     client.FDTotalValue = 0;
+    //     client.FDTotalInvested = 0;
+    //   }
+
+    //   // Remove FD reference from client
+    //   client.FDInvestments.pull(fd._id);
+
+    //   await client.save({ session });
+
+    //   // Delete FD
+    //   await FDInvestment.deleteOne({ _id: fd._id }).session(session);
+    // }
+
+    // 3️⃣ FULL WITHDRAWAL (FD CLOSE)
+    else {
       // Update client totals
       client.FDTotalValue -= fd.totalValue;
       client.FDTotalInvested -= fd.investedValue;
+
       if (client.FDTotalInvested < 1) {
         client.FDTotalValue = 0;
         client.FDTotalInvested = 0;
       }
 
-      // Remove FD reference from client
-      client.FDInvestments.pull(fd._id);
 
+      // Update FD instead of deleting
+      fd.totalValue = 0;
+      fd.investedValue = 0;
+      fd.rate = 0;
+      fd.status = "closed";
+      
+
+      fd.FDWithdrawals.push(withdraw._id);
+
+      await fd.save({ session });
       await client.save({ session });
-
-      // Delete FD
-      await FDInvestment.deleteOne({ _id: fd._id }).session(session);
     }
 
     await session.commitTransaction();
     transactionCommitted = true;
-    const LTReturns=client.FDLTReturns;
+    const LTReturns = client.FDLTReturns;
     // Recalculate interest after commit
     await updateFDs();
 
     const updatedClient = await Client.findById(client._id);
     updatedClient.FDLTReturns = LTReturns;
     await updatedClient.save();
-    
+
     return res.status(200).json({
       success: true,
       message: "Amount withdrawn successfully",
@@ -134,6 +158,4 @@ export const withdrawFD = async (req, res) => {
   } finally {
     session.endSession();
   }
-  
 };
-

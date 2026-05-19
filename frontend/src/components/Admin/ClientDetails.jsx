@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IdCard, User, Home, Phone, Mail, Wallet, TrendingUp, CircleDollarSign, Calendar, Edit2, Trash2, CalendarDays, PiggyBank, IndianRupee, LineChart, ChevronDown,BarChart3  } from "lucide-react";
+import { IdCard, User, Home, Phone, Mail, Wallet, TrendingUp, CircleDollarSign, Calendar, Edit2, Trash2, CalendarDays, PiggyBank, IndianRupee, LineChart, ChevronDown, BarChart3, BadgeCheck } from "lucide-react";
 import { NavBar } from "../NavBar";
 import { AddInterestForm } from "./AddInterest";
 import { AddInvestmentForm } from "./AddInvestment";
@@ -243,7 +243,7 @@ export const ClientDetails = () => {
                             </div>
 
                             <div className="flex items-center gap-2 text-sm text-zinc-700">
-                                <BarChart3  className="w-4 h-4 text-red-600" /> <span><b>LT Returns:</b> ₹{investmentType=== "mf" ?toIndianFormat(Number(client?.MFLTReturns) || 0) : toIndianFormat(Number(client?.FDLTReturns) || 0)}</span>
+                                <BarChart3 className="w-4 h-4 text-red-600" /> <span><b>LT Returns:</b> ₹{investmentType === "mf" ? toIndianFormat(Number(client?.MFLTReturns) || 0) : toIndianFormat(Number(client?.FDLTReturns) || 0)}</span>
                             </div>
 
                             {investmentType === "mf" &&
@@ -256,7 +256,7 @@ export const ClientDetails = () => {
                                         <LineChart className="w-4 h-4 text-indigo-600" />
                                         <span><b>XIRR:</b> {xirr ? `${xirr}%` : "0%"}</span>
                                     </div>
-                                    
+
                                 </>
                             }
 
@@ -311,7 +311,7 @@ export const ClientDetails = () => {
                                                         : "text-green-600"
                                                 }
                                             >
-                                               <span>{Number(p?.investedValue)<0 && "-"}</span> ₹{Math.abs(Number(p?.investedValue)).toLocaleString("en-IN")}
+                                                <span>{Number(p?.investedValue) < 0 && "-"}</span> ₹{Math.abs(Number(p?.investedValue)).toLocaleString("en-IN")}
                                             </div>
 
                                             <div>₹{toIndianFormat(p?.totalValue)}</div>
@@ -335,7 +335,7 @@ export const ClientDetails = () => {
                             // <FDInvestmentSection client={client}/>
                             <div className="overflow-x-auto overflow-y-auto">
                                 <div className="md:min-w-[600px] min-w-[800px]">
-                                    <div className="grid grid-cols-6 font-semibold bg-blue-600 text-white py-2 px-3 rounded-md shadow">
+                                    <div className="grid grid-cols-[1.1fr_1.2fr_0.8fr_1.3fr_1.2fr_0.9fr_1.4fr] items-center font-semibold bg-blue-600 text-white py-3 px-5 rounded-xl shadow-sm">
                                         <div className="flex items-center gap-1">
                                             <CalendarDays size={16} /> Date
                                         </div>
@@ -343,12 +343,17 @@ export const ClientDetails = () => {
                                             <PiggyBank size={16} /> Invested
                                         </div>
                                         <div className="flex items-center gap-1">
-                                            <TrendingUp size={16} /> Current ROI
+                                            <TrendingUp size={16} /> ROI
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <IndianRupee size={16} /> Returns
                                         </div>
                                         <div className="flex items-center gap-1"><Wallet size={16} /> Current Value</div>
+
+                                        <div className="flex items-center gap-1 ml-4">
+                                            <BadgeCheck size={16} />
+                                            Status
+                                        </div>
                                         <div className="text-center flex ">
                                             <div className="w-3/4 text-center">Actions</div>
                                             <div></div>
@@ -360,12 +365,41 @@ export const ClientDetails = () => {
                                     }
 
                                     {client?.FDInvestments?.map((p) => (
-                                        <div key={p._id} className="grid grid-cols-6 items-center py-3 px-3 bg-white border-b border-zinc-200 text-sm">
+                                        <div
+  key={p._id}
+  className="grid grid-cols-[1.1fr_1.2fr_0.8fr_1.3fr_1.2fr_0.9fr_1.4fr] items-center py-4 px-5 bg-white border-b border-zinc-100 text-sm hover:bg-zinc-50 transition"
+>
                                             <div>{formatDate(p?.investedDate)}</div>
                                             <div className="ml-2">₹{toIndianFormat(p?.investedAtBeginning.toFixed(2))}</div>
-                                            <div className="ml-5">{p?.rate}%</div>
-                                            <div className="text-green-600 ml-2">+₹{toIndianFormat((p?.totalValue - p?.investedValue).toFixed(2))} ({((p?.totalValue - p?.investedValue) * 100 / p?.investedValue).toFixed(2)}%)</div>
-                                            <div className="ml-3">₹{toIndianFormat(p.totalValue.toFixed(0))}</div>
+                                            <div className="ml-3">{p?.rate}%</div>
+
+                                            {/* <div className="text-green-600 ml-2">+₹{toIndianFormat((p?.totalValue - p?.investedValue).toFixed(2))} ({((p?.totalValue - p?.investedValue) * 100 / p?.investedValue).toFixed(2)}%)</div> */}
+
+                                            <div className="text-green-600 ml-1">
+                                                +₹
+                                                {toIndianFormat((p?.totalValue - p?.investedValue).toFixed(2))}
+                                                (
+                                                {p?.totalValue === 0 || p?.investedValue === 0
+                                                    ? "0.00"
+                                                    : (
+                                                        ((p?.totalValue - p?.investedValue) * 100) /
+                                                        p?.investedValue
+                                                    ).toFixed(2)}
+                                                %)
+                                            </div>
+
+                                            <div className="ml-5">₹{toIndianFormat(p.totalValue.toFixed(0))}</div>
+
+                                            <div
+                                                className={`ml-6 px-3 py-1 rounded-full text-[11px] font-semibold w-fit
+    ${p.status === "active"
+                                                        ? "bg-green-100 text-green-700 border border-green-300"
+                                                        : "bg-red-100 text-red-700 border border-red-300"
+                                                    }`}
+                                            >
+                                                {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                                            </div>
+
                                             <div className="flex">
                                                 <div className="flex justify-center gap-3 w-3/4">
                                                     <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
@@ -392,7 +426,7 @@ export const ClientDetails = () => {
 
                                             </div>
                                             {openFD === p._id && (
-                                                <div className="col-span-6 bg-slate-50 border border-blue-100 rounded-lg mt-2 px-5 py-4 shadow-inner animate-fadeIn">
+                                                <div className="col-span-7 bg-slate-50 border border-blue-100 rounded-lg mt-2 px-5 py-4 shadow-inner animate-fadeIn">
 
                                                     <div className="text-sm font-semibold text-blue-700 mb-3">
                                                         Withdrawal History

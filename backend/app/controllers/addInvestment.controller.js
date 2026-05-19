@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import { AddInterest } from "../models/addInterest.model.js";
 import { Client } from "../models/client.model.js";
 import { FDInvestment } from "../models/fdInvestment.model.js";
+import { FDWithdraw } from "../models/fdwithdraw.model.js";
 import { MFInvestment } from "../models/mfInvestment.model.js";
 import { updateFDs } from "../utils/fdCalculation.js";
 
@@ -23,7 +25,7 @@ export const addMFInvestment = async (req, res) => {
         success: false,
       });
     }
-    
+
     if (investedValue < 0) {
       const withdrawal = Math.abs(investedValue); // positive number
 
@@ -306,7 +308,7 @@ export const deleteMFInvestment = async (req, res) => {
 
           // Remove return reference
           client.MFPeriodicInterest = client.MFPeriodicInterest.filter(
-            (id) => id.toString() !== ret._id.toString()
+            (id) => id.toString() !== ret._id.toString(),
           );
 
           // Adjust total value
@@ -329,7 +331,7 @@ export const deleteMFInvestment = async (req, res) => {
 
     // Remove investment reference
     client.MFInvestments = client.MFInvestments.filter(
-      (id) => id.toString() !== investmentId
+      (id) => id.toString() !== investmentId,
     );
 
     // Save once — prevents version conflict
@@ -388,16 +390,20 @@ export const editFDInvestment = async (req, res) => {
       });
     }
 
-    client.FDLTReturns = Number(client.FDLTReturns) - Number(fd.totalValue) + Number(fd.investedValue);
-    client.FDTotalValue = Number(client.FDTotalValue) - Number(fd.totalValue) + Number(investedValue);
-    if(Number(client.FDLTReturns)<0) client.FDLTReturns=0;
+    client.FDLTReturns =
+      Number(client.FDLTReturns) -
+      Number(fd.totalValue) +
+      Number(fd.investedValue);
+    client.FDTotalValue =
+      Number(client.FDTotalValue) -
+      Number(fd.totalValue) +
+      Number(investedValue);
+    if (Number(client.FDLTReturns) < 0) client.FDLTReturns = 0;
 
     fd.investedValue = Number(investedValue);
-    fd.investedAtBeginning=Number(investedValue);
+    fd.investedAtBeginning = Number(investedValue);
     fd.date = date;
-    fd.investedDate=date;
-
-    
+    fd.investedDate = date;
 
     await client.save();
 
@@ -420,37 +426,134 @@ export const editFDInvestment = async (req, res) => {
   }
 };
 
+// export const deleteFDInvestment = async (req, res) => {
+//   try {
+//     const { investmentId } = req.params;
+//     if (!investmentId)
+//       return res
+//         .status(400)
+//         .json({ message: "Investment ID required", success: false });
+
+//     const investment = await FDInvestment.findById(investmentId);
+//     if (!investment)
+//       return res
+//         .status(404)
+//         .json({ message: "Investment not found", success: false });
+
+//     const client = await Client.findById(investment.client);
+//     if (client) {
+//       client.FDLTReturns = Number(client.FDLTReturns) - Number(investment.totalValue) + Number(investment.investedValue);
+//       client.FDTotalInvested -= Number(investment.investedValue);
+//       client.FDTotalValue -= Number(investment.totalValue);
+//       client.FDInvestments = client.FDInvestments.filter(
+//         (id) => id.toString() !== investmentId
+//       );
+//       if (client.FDInvestments.length === 0) {
+//         client.FDTotalInvested = 0;
+//         client.FDTotalValue = 0;
+//         client.FDLTReturns = 0;
+//       }
+//       await client.save();
+//     }
+
+//     await investment.deleteOne();
+//     await updateFDs();
+
+//     return res.status(200).json({
+//       message: "FD Investment deleted successfully",
+//       success: true,
+//     });
+//   } catch (error) {
+//     console.error("Error deleting FD investment:", error);
+//     return res.status(500).json({
+//       message: "Internal server error",
+//       success: false,
+//       error: error.message,
+//     });
+//   }
+// };
+
+
 export const deleteFDInvestment = async (req, res) => {
+  const session = await mongoose.startSession();
+
   try {
+    session.startTransaction();
+
     const { investmentId } = req.params;
-    if (!investmentId)
-      return res
-        .status(400)
-        .json({ message: "Investment ID required", success: false });
 
-    const investment = await FDInvestment.findById(investmentId);
-    if (!investment)
-      return res
-        .status(404)
-        .json({ message: "Investment not found", success: false });
+    if (!investmentId) {
+      await session.abortTransaction();
 
-    const client = await Client.findById(investment.client);
+      return res.status(400).json({
+        message: "Investment ID required",
+        success: false,
+      });
+    }
+
+    // Find investment
+    const investment =
+      await FDInvestment.findById(investmentId).session(session);
+
+    if (!investment) {
+      await session.abortTransaction();
+
+      return res.status(404).json({
+        message: "Investment not found",
+        success: false,
+      });
+    }
+
+    // Find client
+    const client = await Client.findById(investment.client).session(session);
+
     if (client) {
-      client.FDLTReturns = Number(client.FDLTReturns) - Number(investment.totalValue) + Number(investment.investedValue);
-      client.FDTotalInvested -= Number(investment.investedValue);
-      client.FDTotalValue -= Number(investment.totalValue);
+      // Update totals
+      client.FDLTReturns =
+        Number(client.FDLTReturns) -
+        Number(investment.totalValue) +
+        Number(investment.investedValue);
+
+      client.FDTotalInvested =
+        Number(client.FDTotalInvested) - Number(investment.investedValue);
+
+      client.FDTotalValue =
+        Number(client.FDTotalValue) - Number(investment.totalValue);
+
+      // Remove FD reference
       client.FDInvestments = client.FDInvestments.filter(
-        (id) => id.toString() !== investmentId
+        (id) => id.toString() !== investmentId,
       );
+
+      // Reset totals if no FDs left
       if (client.FDInvestments.length === 0) {
         client.FDTotalInvested = 0;
         client.FDTotalValue = 0;
         client.FDLTReturns = 0;
       }
-      await client.save();
+
+      await client.save({ session });
     }
 
-    await investment.deleteOne();
+    // Delete all withdrawals linked to FD
+    await FDWithdraw.deleteMany(
+      {
+        fd: investment._id,
+      },
+      { session },
+    );
+
+    // Delete FD investment
+    await FDInvestment.deleteOne(
+      {
+        _id: investment._id,
+      },
+      { session },
+    );
+
+    await session.commitTransaction();
+
+    // Recalculate after successful deletion
     await updateFDs();
 
     return res.status(200).json({
@@ -458,12 +561,17 @@ export const deleteFDInvestment = async (req, res) => {
       success: true,
     });
   } catch (error) {
+    await session.abortTransaction();
+
     console.error("Error deleting FD investment:", error);
+
     return res.status(500).json({
       message: "Internal server error",
       success: false,
       error: error.message,
     });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -499,7 +607,7 @@ export const resetMFInvestment = async (req, res) => {
     client.MFPeriodicInterest = [];
     client.MFTotalInvested = "0";
     client.MFTotalValue = "0";
-    client.MFReturns="0";
+    client.MFReturns = "0";
 
     await client.save();
 

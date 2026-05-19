@@ -368,7 +368,7 @@ export const FDWithdraw = ({ setWithdrawForm, client }) => {
               <option value="">-- Select FD --</option>
               {client.FDInvestments.map((fd) => (
                 <option key={fd._id} value={fd._id}>
-                  {formatDate(fd.date)} • ₹{formatINR(fd.totalValue)}
+                  {formatDate(fd.investedDate)} • ₹{formatINR(fd.totalValue)}
                 </option>
               ))}
             </select>
