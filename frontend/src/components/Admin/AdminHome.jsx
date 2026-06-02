@@ -130,7 +130,8 @@ export const AdminHome = () => {
                   {toIndianFormat(
                     (
                       (Number(client?.FDTotalValue) || 0) +
-                      (Number(client?.MFTotalValue) || 0)
+                      (Number(client?.MFTotalValue) || 0) +
+                      (Number(client?.SMEIPOTotalValue) || 0)
                     ).toFixed(0)
                   ) || "NA"}
                 </div>

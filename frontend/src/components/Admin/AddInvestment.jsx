@@ -21,7 +21,10 @@ export const AddInvestmentForm = ({ setInvestmentForm, client, investmentType })
       const currentTotal =
         investmentType === "mf"
           ? Number(client.MFTotalInvested || 0)
-          : Number(client.FDTotalValue || 0);
+          : investmentType === "fd"
+          ? Number(client.FDTotalInvested || 0)
+          : Number(client.SMEIPOTotalInvested || 0)
+          ;
 
       setBaseTotal(currentTotal);
 

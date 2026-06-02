@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from 'react'
 
 import { BarChart3, Target, TrendingUp, Wallet, History, Calendar } from "lucide-react";
-import { calculateYearlyInterest, formatDate, formatYearMonth, getAnnualizedReturn, getProjectedReturns, projectFDReturns, toIndianFormat } from './utils';
+import { calculateYearlyInterest, formatDate, formatYearMonth, getAnnualizedReturn, getProjectedReturns, projectSMEIPOReturns, toIndianFormat } from './utils';
 
 
 
-export const AnalyseFD = ({ selectedfd, client,setOpenAnalyse }) => {
+export const AnalyseSMEIPO = ({ selectedipo, client,setOpenAnalyse }) => {
     const [projectedReturn, setProjectedReturn] = useState([]);
     const[totalValue,setTotalValue]=useState();
     const [invested,setInvested]=useState();
-    const [fdData, setFdData] = useState(null);
+    const [ipoData, setIpoData] = useState(null);
 
     useEffect(() => {
         if (!client) return;
 
-        const fd = client?.FDInvestments?.find(
-            (f) => f._id === selectedfd
+        const ipo = client?.SMEIPOInvestments?.find(
+            (p) => p._id === selectedipo
         );
 
-        if (!fd) return;
+        if (!ipo) return;
 
-        setTotalValue(fd.totalValue);
-        setInvested(fd.investedValue);
-        setProjectedReturn(projectFDReturns(fd));
-        setFdData(fd);
+        setTotalValue(ipo.totalValue);
+        setInvested(ipo.investedValue);
+        setProjectedReturn(projectSMEIPOReturns(ipo));
+        setIpoData(ipo);
 
-    }, [client, selectedfd]);
+    }, [client, selectedipo]);
 
     return (
         <div className='fixed inset-0 z-50 bg-black/50 flex items-center justify-center' onClick={() => setOpenAnalyse(false)}>
@@ -74,17 +74,18 @@ export const AnalyseFD = ({ selectedfd, client,setOpenAnalyse }) => {
 
                 </div>
 
-                {fdData?.status === "closed" ? (
+
+                {ipoData?.status === "closed" ? (
                     <div className="h-[78%] flex flex-col justify-center items-center text-center px-6">
                         <div className="text-4xl mb-3">🔒</div>
 
                         <div className="text-2xl font-semibold text-zinc-700">
-                            Fixed Deposit Closed
+                            SME IPO Investment Closed
                         </div>
 
                         <div className="mt-2 text-zinc-500 max-w-md">
-                            This FD has been fully withdrawn and is no longer active.
-                            Future return projections are unavailable for closed deposits.
+                            This Investment has been fully withdrawn and is no longer active.
+                            Future return projections are unavailable for closed Investments.
                         </div>
                     </div>
                 ) : (
@@ -152,12 +153,9 @@ export const AnalyseFD = ({ selectedfd, client,setOpenAnalyse }) => {
                         </div>
 
                     </div>
-                    </>
-
-
-                )}
                 
-
+                    </>
+                )}
 
             </div>
         </div>

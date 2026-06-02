@@ -1,6 +1,7 @@
 import { Client } from "../models/client.model.js";
 import { FDInvestment } from "../models/fdInvestment.model.js";
 import { MFInvestment } from "../models/mfInvestment.model.js";
+import { smeipoWithdraw } from "../models/smeipo.withdraw.model.js";
 import { User } from "../models/user.model.js";
 import { clientApprovalEmail } from "../utils/emailTemplate.js";
 import {   transporter } from "../utils/sendEmail.js";
@@ -105,6 +106,14 @@ export const get1ClientDetails = async (req, res) => {
         options: { sort: { createdAt: -1 } },
         populate: {
           path: "FDWithdrawals",
+          options: { sort: { createdAt: -1 } },
+        }, // newest first
+      })
+      .populate({
+        path: "SMEIPOInvestments",
+        options: { sort: { createdAt: -1 } },
+        populate: {
+          path: "smeipoWithdrawals",
           options: { sort: { createdAt: -1 } },
         }, // newest first
       })

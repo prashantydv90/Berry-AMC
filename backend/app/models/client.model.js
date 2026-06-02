@@ -12,8 +12,11 @@ const clientSchema = new mongoose.Schema(
     MFReturns:{type:String, default: "0"},
     FDTotalInvested:{type:String,default:"0"},
     FDTotalValue:{type:String, default: "0"},
+    SMEIPOTotalInvested:{type:String,default:"0"},
+    SMEIPOTotalValue:{type:String, default: "0"},
     FDLTReturns:{type:String, default: "0"},
     MFLTReturns:{type:String, default: "0"},
+    SMEIPOLTReturns:{type:String, default: "0"},
 
     MFPeriodicInterest:[
       {
@@ -34,6 +37,13 @@ const clientSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "FDInvestment",
+      },
+    ],
+
+    SMEIPOInvestments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "smeipo",
       },
     ],
     

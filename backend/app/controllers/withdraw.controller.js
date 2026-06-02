@@ -47,9 +47,7 @@ export const withdrawFD = async (req, res) => {
       });
     }
 
-    client.FDTotalValue -= fd.totalValue;
-    fd.totalValue = fdValueAtWithdrawal;
-    client.FDTotalValue += fd.totalValue;
+    const amountAdjustedinLT=Number(fd.totalValue)-Number(fdValueAtWithdrawal);
 
     // 1️⃣ Create withdrawal record
     const [withdraw] = await FDWithdraw.create(
@@ -57,7 +55,7 @@ export const withdrawFD = async (req, res) => {
         {
           fd: fd._id,
           amount,
-          fdValueAtWithdrawal: fd.totalValue,
+          fdValueAtWithdrawal,
           withdrawalDate: date,
         },
       ],
@@ -65,17 +63,30 @@ export const withdrawFD = async (req, res) => {
     );
 
     // 2️⃣ PARTIAL WITHDRAWAL
-    if (amount < fd.totalValue) {
-      client.FDTotalValue -= amount;
-      client.FDTotalInvested -= fd.investedValue;
+    if (Number(fdValueAtWithdrawal)>Number(amount)) {
+      client.FDTotalValue =
+        Number(client.FDTotalValue) - Number(fd.totalValue);
+
+      client.FDTotalInvested =
+        Number(client.FDTotalInvested) - Number(fd.investedValue);
+
+      client.FDLTReturns =
+        Number(client.FDLTReturns) - Number(amountAdjustedinLT);
 
       fd.totalValue -= amount;
       fd.investedValue = fd.totalValue;
+
+      fd.investedValue = Number(fdValueAtWithdrawal) - Number(amount);
+      fd.totalValue = fd.investedValue;
       fd.date = new Date(date);
 
       // Update client totals (incremental)
 
-      client.FDTotalInvested += fd.investedValue;
+      client.FDTotalValue =
+        Number(client.FDTotalValue) + Number(fd.investedValue);
+
+      client.FDTotalInvested =
+        Number(client.FDTotalInvested) + Number(fd.investedValue);
 
       fd.FDWithdrawals.push(withdraw._id);
 
@@ -84,32 +95,16 @@ export const withdrawFD = async (req, res) => {
     }
 
     // 3️⃣ FULL WITHDRAWAL (FD CLOSE)
-    // else {
-    //   // Remove all withdrawals
-    //   await FDWithdraw.deleteMany({ fd: fd._id }).session(session);
-
-    //   // Update client totals
-    //   client.FDTotalValue -= fd.totalValue;
-    //   client.FDTotalInvested -= fd.investedValue;
-    //   if (client.FDTotalInvested < 1) {
-    //     client.FDTotalValue = 0;
-    //     client.FDTotalInvested = 0;
-    //   }
-
-    //   // Remove FD reference from client
-    //   client.FDInvestments.pull(fd._id);
-
-    //   await client.save({ session });
-
-    //   // Delete FD
-    //   await FDInvestment.deleteOne({ _id: fd._id }).session(session);
-    // }
-
-    // 3️⃣ FULL WITHDRAWAL (FD CLOSE)
     else {
       // Update client totals
-      client.FDTotalValue -= fd.totalValue;
-      client.FDTotalInvested -= fd.investedValue;
+      client.FDTotalValue =
+        Number(client.FDTotalValue) - Number(fd.totalValue);
+
+      client.FDTotalInvested =
+        Number(client.FDTotalInvested) - Number(fd.investedValue);
+
+      client.FDLTReturns =
+        Number(client.FDLTReturns) - Number(amountAdjustedinLT);
 
       if (client.FDTotalInvested < 1) {
         client.FDTotalValue = 0;
@@ -132,13 +127,8 @@ export const withdrawFD = async (req, res) => {
 
     await session.commitTransaction();
     transactionCommitted = true;
-    const LTReturns = client.FDLTReturns;
-    // Recalculate interest after commit
-    await updateFDs();
 
-    const updatedClient = await Client.findById(client._id);
-    updatedClient.FDLTReturns = LTReturns;
-    await updatedClient.save();
+    await updateFDs();
 
     return res.status(200).json({
       success: true,

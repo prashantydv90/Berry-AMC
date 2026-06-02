@@ -245,6 +245,39 @@ export const projectFDReturns = (fd) => {
 };
 
 
+export const projectSMEIPOReturns = (fd) => {
+  const projections = [];
+  const investedValue = fd.investedValue;
+  const fdDate = new Date(fd.date);
+
+  for (let year = 1; year <= 15; year++) {
+    // Projection date = fd.date + year
+    const projectionDate = new Date(fdDate);
+    projectionDate.setFullYear(fdDate.getFullYear() + year);
+
+    // Months elapsed from start to this projection date
+    const monthsElapsed = year * 12;
+
+    // Convert months to years for compounding
+    const yearsElapsed = monthsElapsed / 12;
+
+    // Determine applicable FD rate
+    // const rate = getFdRate(monthsElapsed);
+    const rate=10;
+
+    // Calculate compounded total value
+    const totalValue = investedValue * Math.pow(1 + rate / 100, yearsElapsed);
+
+    projections.push({
+      date: projectionDate.toISOString().split("T")[0], // YYYY-MM-DD
+      totalValue: parseFloat(totalValue.toFixed(2)),
+    });
+  }
+
+  return projections;
+};
+
+
 
 
 // function getFdRate(months) {
@@ -284,4 +317,30 @@ function normalizeDate(d) {
   date.setHours(0, 0, 0, 0);
   return date;
 }
+
+
+
+function getSMEIPORate(months) {
+  if (months <= 3) return 7;
+  if (months <= 6) return 8;
+  if (months <= 12) return 9;
+  return 10;
+}
+
+export const calculateSMEIPOValue = (principal, startDate, endDate)=> {
+  const e=normalizeDate(endDate);
+  const s=normalizeDate(startDate);
+  const diffMs = e-s;
+  const days = diffMs / (1000 * 60 * 60 * 24);
+  const years = days / 365;
+  const months = days / 30;
+
+  const rate = getSMEIPORate(months);
+  const value = principal * Math.pow(1 + rate / 100, years);
+
+  return { value, rate };
+}
+
+
+
 

@@ -12,21 +12,24 @@ import Footer from "./Footer";
 import axios from "axios";
 import formatDateRange, { formatYearMonth, toIndianFormat } from "./utils";
 import { AnalyseFD } from "./AnalyseFD";
+import { AnalyseSMEIPO } from "./AnalyseSMEIPO";
 import { useUser } from "./UserContext";
 import { Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import { AiOutlineBank } from "react-icons/ai"; // icons for MF and FD
+import { AiOutlineBank ,AiOutlineRise } from "react-icons/ai"; // icons for MF and FD
 import { ChevronDown, HelpCircle } from "lucide-react";
 import calculateClientXIRR from "./xirr";
 import MFInvestmentTable from "./MFInvestmentDetailsCard";
 import FDInvestmentTable from "./FDInvestmentDetails";
+import SMEIPOInvestmentTable from "./SMEIPOInvestmentDetails";
 
 export const DashBoard = () => {
     const [openAnalyse, setOpenAnalyse] = useState(false);
     const [openForm, setOpenForm] = useState(false);
     const [selected, setSelected] = useState("mf");
     const [selectedfd, setSelectedfd] = useState(null);
+    const [selectedipo, setSelectedipo] = useState(null);
     const [client, setClient] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -49,7 +52,8 @@ export const DashBoard = () => {
         let investment = null;
         if (client) {
             if (selected === "mf") setInvestments(client.MFInvestments);
-            else setInvestments(client.FDInvestments);
+            else if (selected === "fd") setInvestments(client.FDInvestments);
+            else setInvestments(client.SMEIPOInvestments);
         }
     }, [client, selected])
 
@@ -103,7 +107,9 @@ export const DashBoard = () => {
 
             setTotalReturn(toIndianFormat(returns));
             setTotalReturnPercent(((returns / invested) * 100).toFixed(2));
-        } else if (
+        } 
+        //fd
+        else if (
   selected === "fd" &&
   client?.FDInvestments?.find(
     (fd) => fd._id === selectedfd
@@ -117,28 +123,28 @@ export const DashBoard = () => {
             setTotalReturn(toIndianFormat(returns.toFixed(2)));
             setTotalReturnPercent(((returns / fd.investedValue) * 100).toFixed(2));
         }
-    }, [selected, selectedfd, client]);
 
-    // useEffect(() => {
-    //     if (!client?.FDInvestments || selected !== "fd") return;
 
-    //     const activeFDs = client.FDInvestments.filter(
-    //         (fd) => fd.status === "active"
-    //     );
+        //smeipo
+        else if (
+  selected === "smeipo" &&
+  client?.SMEIPOInvestments?.find(
+    (smeipo) => smeipo._id === selectedipo
+  )
+) {
+            // const fd = client.FDInvestments[selectedfd];
+            const smeipo = client.SMEIPOInvestments.find(
+  (smeipo) => smeipo._id === selectedipo
+);
+            const returns = smeipo.totalValue - smeipo.investedValue;
+            setTotalReturn(toIndianFormat(returns.toFixed(2)));
+            setTotalReturnPercent(((returns / smeipo.investedValue) * 100).toFixed(2));
+        }
+        
+    }, [selected, selectedfd, selectedipo, client]);
 
-    //     // If only one FD exists overall
-    //     if (client.FDInvestments.length === 1) {
-    //         setSelectedfd(client.FDInvestments[0]._id);
-    //         return;
-    //     }
-
-    //     // If multiple FDs exist, auto-select first active FD
-    //     if (activeFDs.length > 0 && !selectedfd) {
-    //         setSelectedfd(activeFDs[0]._id);
-    //     }
-    // }, [client, selected]);
     
-
+// fd useeffect
     useEffect(() => {
   if (!client?.FDInvestments || selected !== "fd") return;
 
@@ -183,6 +189,54 @@ export const DashBoard = () => {
   }
 
 }, [client, selected]);
+
+
+//SME IPO Invested
+useEffect(() => {
+  if (!client?.SMEIPOInvestments || selected !== "smeipo") return;
+
+  const activeIPOs = client.SMEIPOInvestments.filter(
+    (smeipo) => smeipo.status === "active"
+  );
+
+  const closedIPOs = client.SMEIPOInvestments.filter(
+    (smeipo) => smeipo.status === "closed"
+  );
+
+  // ACTIVE FD FLOW
+  if (activeIPOs.length > 0) {
+
+    // Single active FD
+    if (activeIPOs.length === 1) {
+      setSelectedipo(activeIPOs[0]._id);
+      return;
+    }
+
+    // Multiple active FDs
+    if (!selectedipo) {
+      setSelectedipo(activeIPOs[0]._id);
+    }
+
+    return;
+  }
+
+  // CLOSED FD FLOW
+  if (closedIPOs.length > 0) {
+
+    // Single closed FD
+    if (closedIPOs.length === 1) {
+      setSelectedipo(closedIPOs[0]._id);
+      return;
+    }
+
+    // Multiple closed FDs
+    if (!selectedipo) {
+      setSelectedipo(closedIPOs[0]._id);
+    }
+  }
+
+}, [client, selected]);
+
 
     // ---------- CONDITIONAL RENDERS ----------
     if (loading) {
@@ -257,7 +311,8 @@ export const DashBoard = () => {
 
     const hasNoInvestments =
         (!client?.MFInvestments || client.MFInvestments.length === 0) &&
-        (!client?.FDInvestments || client.FDInvestments.length === 0);
+        (!client?.FDInvestments || client.FDInvestments.length === 0) &&
+        (!client?.SMEIPOInvestments || client.SMEIPOInvestments.length === 0);
 
     if (hasNoInvestments) {
         return (
@@ -306,6 +361,7 @@ export const DashBoard = () => {
                         options={[
                             { value: "mf", label: "Mutual Fund", icon: <AiOutlineStock /> },
                             { value: "fd", label: "Fixed Deposit", icon: <AiOutlineBank /> },
+                            { value: "smeipo", label: "SME IPO", icon: <AiOutlineRise  /> },
                         ]}
 
                     />
@@ -313,10 +369,12 @@ export const DashBoard = () => {
 
 
                 {(selected === "fd" && (!client?.FDInvestments || client.FDInvestments.length === 0)) ||
-                    (selected === "mf" && (!client?.MFInvestments || client.MFInvestments.length === 0)) ? (
+                    (selected === "mf" && (!client?.MFInvestments || client.MFInvestments.length === 0)) || (selected === "smeipo" && (!client?.SMEIPOInvestments || client.SMEIPOInvestments.length === 0))
+                    
+                    ? (
                     <div className="flex flex-col items-center justify-center h-[60vh] w-full px-6">
                         <div className="text-zinc-600 font-medium text-lg">
-                            {selected === "fd" ? "No FD Investment Found" : "No Mutual Fund Investment Found"}
+                            {selected === "fd" ? "No FD Investment Found" : selected === "mf" ? "No Mutual Fund Investment Found" : "No SME IPO Investment Found"}
                         </div>
                         <div className="text-sm text-zinc-500 mt-2">
                             Please check again later or contact your advisor for updates.
@@ -358,8 +416,8 @@ export const DashBoard = () => {
                             <div className="w-50">
                                 {selected === "fd" &&
                                     client?.FDInvestments?.filter(
-  (fd) => fd.status === "active"
-).length > 1 && (
+                                    (fd) => fd.status === "active"
+                                    ).length > 1 && (
                                         <CustomDropdown
                                             label="Choose FD"
                                             value={selectedfd}
@@ -376,6 +434,30 @@ export const DashBoard = () => {
                                         />
                                     )}
                             </div>
+
+                            <div className="w-50">
+                                {selected === "smeipo" &&
+                                    client?.SMEIPOInvestments?.filter(
+                                    (smeipo) => smeipo.status === "active"
+                                    ).length > 1 && (
+                                        <CustomDropdown
+                                            label="Choose SME IPO"
+                                            value={selectedipo}
+                                            onChange={(val) => setSelectedipo(val)}
+                                            options={client.SMEIPOInvestments
+                                                .filter((smeipo) => smeipo.status === "active")
+                                                .map((smeipo, index) => ({
+                                                    value: smeipo._id,
+                                                    label: `SME IPO (${index + 1}) - ₹${toIndianFormat(
+                                                        smeipo.totalValue.toFixed(0)
+                                                    )}`,
+                                                    icon: <AiOutlineRise />,
+                                                }))}
+                                        />
+                                    )}
+                            </div>
+
+
                         </div>
 
 
@@ -394,12 +476,20 @@ export const DashBoard = () => {
                                         ₹
                                         {selected === "mf"
                                             ? toIndianFormat(Number(client?.MFTotalValue).toFixed(0))
-                                            : toIndianFormat(
+                                            : selected === "fd"
+                                            ? toIndianFormat(
                                                 // client?.FDInvestments[selectedfd].totalValue.toFixed(0)
                                                 client?.FDInvestments.find(
-  (fd) => fd._id === selectedfd
-)?.totalValue.toFixed(0)
-                                            )}
+                                                (fd) => fd._id === selectedfd
+                                                )?.totalValue.toFixed(0)
+                                            )
+                                            : toIndianFormat(
+                                                // client?.FDInvestments[selectedfd].totalValue.toFixed(0)
+                                                client?.SMEIPOInvestments.find(
+                                                (smeipo) => smeipo._id === selectedipo
+                                                )?.totalValue.toFixed(0)
+                                            )
+                                        }
                                     </div>
                                 </div>
                                 <div className="flex items-center w-1/2">
@@ -423,12 +513,18 @@ export const DashBoard = () => {
                                         ₹
                                         {selected === "mf"
                                             ? toIndianFormat(client?.MFTotalInvested)
-                                            : toIndianFormat(
+                                            : selected === "fd"
+                                            ? toIndianFormat(
                                                 // client?.FDInvestments[selectedfd].investedValue.toFixed(0)
                                                 client?.FDInvestments.find(
-  (fd) => fd._id === selectedfd
-)?.investedValue.toFixed(0)
-                                            )}
+                                                (fd) => fd._id === selectedfd
+                                                )?.investedValue.toFixed(0)
+                                            )
+                                            : toIndianFormat(
+                                                client?.SMEIPOInvestments.find(
+                                                (smeipo) => smeipo._id === selectedipo
+                                                )?.investedValue.toFixed(0))
+                                        }
                                     </div>
                                 </div>
 
@@ -452,11 +548,18 @@ export const DashBoard = () => {
                                                     return isNaN(percent) ? "0.00" : percent.toFixed(2);
                                                 })()}%)
                                             </>
-                                        ) : (
+                                        ) : selected === "fd" 
+                                        ? (
                                             `${client?.FDInvestments.find(
-  (fd) => fd._id === selectedfd
-)?.rate.toFixed(2)}%`
-                                        )}
+                                            (fd) => fd._id === selectedfd
+                                            )?.rate.toFixed(2)}%`
+                                        )
+                                        : (
+                                            `${client?.SMEIPOInvestments.find(
+                                            (smeipo) => smeipo._id === selectedipo
+                                            )?.rate.toFixed(2)}%`
+                                        )
+                                        }
                                     </div>
                                 </div>
 
@@ -488,7 +591,7 @@ export const DashBoard = () => {
 
                                         {/* Value */}
                                         <div className="font-semibold flex flex-1 justify-end md:justify-start text-md md:mr-4.5 ml-auto text-green-600">
-                                            ₹{toIndianFormat(Number(client?.FDLTReturns) || 0)}
+                                            ₹{toIndianFormat(Number(client?.FDLTReturns).toFixed(2) || 0)}
                                         </div>
 
                                         {/* Tooltip */}
@@ -500,6 +603,36 @@ export const DashBoard = () => {
                                     </div>
                                 }
 
+
+                                {selected === "smeipo" &&
+                                    <div className="flex flex-row md:flex-col md:w-[23%] w-full relative">
+
+                                        {/* Label + Icon */}
+                                        <div className="flex items-center gap-1 ml-auto">
+                                            <span className="font-medium text-[15px] md:text-[13.5px] text-zinc-600">
+                                                LT Returns
+                                            </span>
+
+                                            <HelpCircle
+                                                size={14}
+                                                className="text-zinc-500 cursor-pointer"
+                                                onClick={() => setShowTooltip(prev => !prev)}
+                                            />
+                                        </div>
+
+                                        {/* Value */}
+                                        <div className="font-semibold flex flex-1 justify-end md:justify-start text-md md:mr-4.5 ml-auto text-green-600">
+                                            ₹{toIndianFormat(Number(client?.SMEIPOLTReturns).toFixed(2) || 0)}
+                                        </div>
+
+                                        {/* Tooltip */}
+                                        {showTooltip && (
+                                            <div className="absolute -top-8 right-0 text-xs bg-black text-white px-2 py-1 rounded whitespace-nowrap">
+                                                Lifetime Returns in SME IPO Investment
+                                            </div>
+                                        )}
+                                    </div>
+                                }
 
                                 {selected === "mf" &&
                                     <>
@@ -520,7 +653,7 @@ export const DashBoard = () => {
 
                                             {/* Value */}
                                             <div className="font-semibold flex flex-1 justify-end md:justify-start text-md md:mr-4.5 ml-auto text-green-600">
-                                                ₹{toIndianFormat(Number(client?.MFLTReturns) || 0)}
+                                                ₹{toIndianFormat(Number(client?.MFLTReturns).toFixed(0) || 0)}
                                             </div>
 
                                             {/* Tooltip */}
@@ -551,6 +684,10 @@ export const DashBoard = () => {
                                 <div className="md:w-[60%] 2xl:w-[55%] w-[90%] border border-zinc-300 shadow-md rounded-xl mt-15 mb-20">
                                     <FDInvestmentTable investments={investments} />
                                 </div>
+                            ) : selected === "smeipo" ? (
+                                <div className="md:w-[60%] 2xl:w-[55%] w-[90%] border border-zinc-300 shadow-md rounded-xl mt-15 mb-20">
+                                    <SMEIPOInvestmentTable investments={investments} />
+                                </div>
                             ) : null
                         )}
 
@@ -563,6 +700,9 @@ export const DashBoard = () => {
             )}
             {openAnalyse && selected === "fd" && (
                 <AnalyseFD setOpenAnalyse={setOpenAnalyse} selectedfd={selectedfd} client={client} />
+            )}
+            {openAnalyse && selected === "smeipo" && (
+                <AnalyseSMEIPO setOpenAnalyse={setOpenAnalyse} selectedipo={selectedipo} client={client} />
             )}
             {openForm && <OrderForm setOpenForm={setOpenForm} />}
             <Footer />

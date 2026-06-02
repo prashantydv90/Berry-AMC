@@ -5,6 +5,8 @@ import { FDInvestment } from "../models/fdInvestment.model.js";
 import { FDWithdraw } from "../models/fdwithdraw.model.js";
 import { MFInvestment } from "../models/mfInvestment.model.js";
 import { updateFDs } from "../utils/fdCalculation.js";
+import { smeipo } from "../models/smeipo.model.js";
+import { updateSMEIPOs } from "../utils/smeipoCalculation.js";
 
 export const addMFInvestment = async (req, res) => {
   try {
@@ -618,6 +620,84 @@ export const resetMFInvestment = async (req, res) => {
     });
   } catch (error) {
     console.error("Error resetting investments:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+
+
+// SMEIPO INVESTMENT
+
+
+export const addSMEIPOInvestment = async (req, res) => {
+  try {
+    const { clientId, investedValue, totalValue, date } = req.body;
+
+    // Validate input
+    if (!clientId || !investedValue || !totalValue || !date) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        success: false,
+      });
+    }
+
+    // Check client exists
+    const client = await Client.findById(clientId);
+
+    if (!client) {
+      return res.status(404).json({
+        message: "Client not found",
+        success: false,
+      });
+    }
+
+    const currDate = new Date();
+    const inputDate = new Date(date);
+
+    if (inputDate > currDate) {
+      return res.status(400).json({
+        message: "Invalid Date",
+        success: false,
+      });
+    }
+
+    // Create SME IPO investment
+    const newInvestment = await smeipo.create({
+      client: clientId,
+      investedValue,
+      investedAtBeginning: investedValue,
+      investedDate: date,
+      totalValue: investedValue,
+      date,
+      rate: 7, 
+    });
+
+    // Add reference to client
+    client.SMEIPOInvestments.push(newInvestment._id);
+
+    client.SMEIPOTotalValue =
+      Number(client.SMEIPOTotalValue || 0) + Number(investedValue);
+
+    client.SMEIPOTotalInvested =
+      Number(client.SMEIPOTotalInvested || 0) + Number(investedValue);
+
+    await client.save();
+
+    // Recalculate all SME IPO values
+    await updateSMEIPOs();
+
+    return res.status(201).json({
+      message: "SME IPO Investment added successfully",
+      success: true,
+      data: newInvestment,
+    });
+  } catch (error) {
+    console.error("Error adding SME IPO investment:", error);
+
     return res.status(500).json({
       message: "Internal server error",
       success: false,

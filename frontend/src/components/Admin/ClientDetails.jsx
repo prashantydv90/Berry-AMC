@@ -14,6 +14,7 @@ import { EditInterestForm } from "./EditInterest";
 import calculateClientXIRR from "../xirr";
 import { FDWithdraw } from "./FDWithdraw";
 import { MFWithdraw } from "./MFWithdraw";
+import { SMEIPOWithdraw } from "./SMEIPOWithdraw";
 
 
 export const ClientDetails = () => {
@@ -40,9 +41,14 @@ export const ClientDetails = () => {
 
     //fdwithdrawal
     const [openFD, setOpenFD] = useState(null);
+    const [openSMEIPO, setOpenSMEIPO] = useState(null);
 
     const toggleFD = (id) => {
         setOpenFD(prev => (prev === id ? null : id));
+    };
+
+    const toggleSMEIPO = (id) => {
+        setOpenSMEIPO(prev => (prev === id ? null : id));
     };
 
 
@@ -86,6 +92,11 @@ export const ClientDetails = () => {
             const returns = client.FDTotalValue - client.FDTotalInvested;
             setTotalReturn(toIndianFormat(returns.toFixed(2)));
             setTotalReturnPercent(((returns / client.FDTotalInvested) * 100).toFixed(2));
+        }
+        else if (investmentType === 'smeipo' && client) {
+            const returns = client.SMEIPOTotalValue - client.SMEIPOTotalInvested;
+            setTotalReturn(toIndianFormat(returns.toFixed(2)));
+            setTotalReturnPercent(((returns / client.SMEIPOTotalInvested) * 100).toFixed(2));
         }
     }, [investmentType, client]);
 
@@ -184,6 +195,7 @@ export const ClientDetails = () => {
                         <select name="" id="" className='border-1 border-zinc-400 rounded-md py-1 px-1  text-sm focus:outline-0' onClick={(e) => setInvestmentType(e.target.value)}>
                             <option value="mf">Mutual Fund</option>
                             <option value="fd">Fixed Deposit</option>
+                            <option value="smeipo">SME IPO</option>
                         </select>
                     </div>
 
@@ -222,7 +234,13 @@ export const ClientDetails = () => {
                                 <Mail className="w-4 h-4 text-red-600" /> <span><b>Email:</b> {client?.email}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-zinc-700">
-                                <Wallet className="w-4 h-4 text-gray-600" /> <span><b>Invested:</b> ₹{investmentType === 'mf' ? toIndianFormat(client?.MFTotalInvested) : toIndianFormat(client?.FDTotalInvested)}</span>
+                                <Wallet className="w-4 h-4 text-gray-600" /> <span><b>Invested:</b> ₹{
+                                investmentType === 'mf' 
+                                ? toIndianFormat(client?.MFTotalInvested) 
+                                : investmentType==='fd'
+                                ? toIndianFormat(client?.FDTotalInvested)
+                                : toIndianFormat(client?.SMEIPOTotalInvested)
+                                }</span>
                             </div>
                             {/* <div className="flex items-center gap-2 text-sm text-zinc-700">
                                 <CircleDollarSign className="w-4 h-4 text-blue-600" /> <span><b>Current:</b> ₹{investmentType === 'mf' ? toIndianFormat((client?.MFTotalValue).toFixed(0)) : toIndianFormat((client?.FDTotalValue).toFixed(0))}</span>
@@ -233,7 +251,10 @@ export const ClientDetails = () => {
                                     <b>Current:</b> ₹
                                     {investmentType === 'mf'
                                         ? toIndianFormat(Number(client?.MFTotalValue || 0).toFixed(0))
-                                        : toIndianFormat(Number(client?.FDTotalValue || 0).toFixed(0))}
+                                        : investmentType==='fd'
+                                        ? toIndianFormat(Number(client?.FDTotalValue || 0).toFixed(0))
+                                        : toIndianFormat(Number(client?.SMEIPOTotalValue || 0).toFixed(0))
+                                    }
                                 </span>
                             </div>
 
@@ -243,7 +264,7 @@ export const ClientDetails = () => {
                             </div>
 
                             <div className="flex items-center gap-2 text-sm text-zinc-700">
-                                <BarChart3 className="w-4 h-4 text-red-600" /> <span><b>LT Returns:</b> ₹{investmentType === "mf" ? toIndianFormat(Number(client?.MFLTReturns) || 0) : toIndianFormat(Number(client?.FDLTReturns) || 0)}</span>
+                                <BarChart3 className="w-4 h-4 text-red-600" /> <span><b>LT Returns:</b> ₹{investmentType === "mf" ? toIndianFormat(Number(client?.MFLTReturns) || 0) : investmentType==='fd' ? toIndianFormat(Number(client?.FDLTReturns).toFixed(2) || 0) : toIndianFormat(Number(client?.SMEIPOLTReturns).toFixed(2) || 0)}</span>
                             </div>
 
                             {investmentType === "mf" &&
@@ -331,7 +352,7 @@ export const ClientDetails = () => {
                                     ))}
                                 </div>
                             </div>
-                        ) : (
+                        ) : investmentType==='fd' ? (
                             // <FDInvestmentSection client={client}/>
                             <div className="overflow-x-auto overflow-y-auto">
                                 <div className="md:min-w-[600px] min-w-[800px]">
@@ -366,9 +387,9 @@ export const ClientDetails = () => {
 
                                     {client?.FDInvestments?.map((p) => (
                                         <div
-  key={p._id}
-  className="grid grid-cols-[1.1fr_1.2fr_0.8fr_1.3fr_1.2fr_0.9fr_1.4fr] items-center py-4 px-5 bg-white border-b border-zinc-100 text-sm hover:bg-zinc-50 transition"
->
+                                        key={p._id}
+                                        className="grid grid-cols-[1.1fr_1.2fr_0.8fr_1.3fr_1.2fr_0.9fr_1.4fr] items-center py-4 px-5 bg-white border-b border-zinc-100 text-sm hover:bg-zinc-50 transition"
+                                        >
                                             <div>{formatDate(p?.investedDate)}</div>
                                             <div className="ml-2">₹{toIndianFormat(p?.investedAtBeginning.toFixed(2))}</div>
                                             <div className="ml-3">{p?.rate}%</div>
@@ -479,7 +500,157 @@ export const ClientDetails = () => {
                                     ))}
                                 </div>
                             </div>
-                        )}
+                        )
+                        :
+
+                        //SMEIPO Investment Details
+                        (<div className="overflow-x-auto overflow-y-auto">
+                                <div className="md:min-w-[600px] min-w-[800px]">
+                                    <div className="grid grid-cols-[1.1fr_1.2fr_0.8fr_1.3fr_1.2fr_0.9fr_1.4fr] items-center font-semibold bg-blue-600 text-white py-3 px-5 rounded-xl shadow-sm">
+                                        <div className="flex items-center gap-1">
+                                            <CalendarDays size={16} /> Date
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <PiggyBank size={16} /> Invested
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <TrendingUp size={16} /> ROI
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <IndianRupee size={16} /> Returns
+                                        </div>
+                                        <div className="flex items-center gap-1"><Wallet size={16} /> Current Value</div>
+
+                                        <div className="flex items-center gap-1 ml-4">
+                                            <BadgeCheck size={16} />
+                                            Status
+                                        </div>
+                                        <div className="text-center flex ">
+                                            <div className="w-3/4 text-center">Actions</div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+
+                                    {client?.SMEIPOInvestments.length === 0 &&
+                                        <div className="flex justify-center items-center font-medium mt-4">No Investments</div>
+                                    }
+
+                                    {client?.SMEIPOInvestments?.map((p) => (
+                                        <div
+                                        key={p._id}
+                                        className="grid grid-cols-[1.1fr_1.2fr_0.8fr_1.3fr_1.2fr_0.9fr_1.4fr] items-center py-4 px-5 bg-white border-b border-zinc-100 text-sm hover:bg-zinc-50 transition"
+                                        >
+                                            <div>{formatDate(p?.investedDate)}</div>
+                                            <div className="ml-2">₹{toIndianFormat(p?.investedAtBeginning)}</div>
+                                            <div className="ml-3">{p?.rate}%</div>
+
+                                            {/* <div className="text-green-600 ml-2">+₹{toIndianFormat((p?.totalValue - p?.investedValue).toFixed(2))} ({((p?.totalValue - p?.investedValue) * 100 / p?.investedValue).toFixed(2)}%)</div> */}
+
+                                            <div className="text-green-600 ml-1">
+                                                +₹
+                                                {toIndianFormat((p?.totalValue - p?.investedValue).toFixed(2))}
+                                                (
+                                                {p?.totalValue === 0 || p?.investedValue === 0
+                                                    ? "0.00"
+                                                    : (
+                                                        ((p?.totalValue - p?.investedValue) * 100) /
+                                                        p?.investedValue
+                                                    ).toFixed(2)}
+                                                %)
+                                            </div>
+
+                                            <div className="ml-5">₹{toIndianFormat(p.totalValue.toFixed(0))}</div>
+
+                                            <div
+                                                className={`ml-6 px-3 py-1 rounded-full text-[11px] font-semibold w-fit
+    ${p.status === "active"
+                                                        ? "bg-green-100 text-green-700 border border-green-300"
+                                                        : "bg-red-100 text-red-700 border border-red-300"
+                                                    }`}
+                                            >
+                                                {p?.status?.charAt(0).toUpperCase() + p?.status?.slice(1)}
+                                            </div>
+
+                                            <div className="flex">
+                                                <div className="flex justify-center gap-3 w-3/4">
+                                                    <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                                        onClick={() => handleEditInvestment(p)}>
+                                                        <Edit2 size={15} /> Edit
+
+
+                                                    </button>
+                                                    <button className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm"
+                                                        onClick={() => handleDeleteInvestment(investmentType, p._id)}>
+                                                        <Trash2 size={15} /> Delete
+                                                    </button>
+                                                </div>
+                                                <button
+                                                    onClick={() => toggleSMEIPO(p._id)}
+                                                    className="flex justify-end w-1/4 text-gray-500 hover:text-blue-600 transition cursor-pointer"
+                                                >
+                                                    <ChevronDown
+                                                        size={22}
+                                                        className={`transition-transform duration-300 ${openFD === p._id ? "rotate-180" : ""
+                                                            }`}
+                                                    />
+                                                </button>
+
+                                            </div>
+                                            {openSMEIPO === p._id && (
+                                                <div className="col-span-7 bg-slate-50 border border-blue-100 rounded-lg mt-2 px-5 py-4 shadow-inner animate-fadeIn">
+
+                                                    <div className="text-sm font-semibold text-blue-700 mb-3">
+                                                        Withdrawal History
+                                                    </div>
+
+                                                    {p.smeipoWithdrawals?.length === 0 ? (
+                                                        <div className="text-gray-500 text-sm italic">
+                                                            No withdrawals made for this FD.
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-3">
+                                                            {p.smeipoWithdrawals.map((w) => (
+                                                                <div
+                                                                    key={w._id}
+                                                                    className="grid grid-cols-4 gap-4 bg-white p-4 rounded-md border border-gray-200 shadow-sm"
+                                                                >
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500">Date</div>
+                                                                        <div className="font-medium">{formatDate(w.withdrawalDate)}</div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500">Value Before</div>
+                                                                        <div className="font-medium">
+                                                                            ₹{Number(w.valueAtWithdrawal.toFixed(2)).toLocaleString("en-IN")}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500">Withdrawn</div>
+                                                                        <div className="font-semibold text-red-600">
+                                                                            ₹{toIndianFormat(w.amount.toFixed(2))}
+                                                                        </div>
+                                                                    </div>
+
+
+
+                                                                    <div>
+                                                                        <div className="text-xs text-gray-500">Value After</div>
+                                                                        <div className="font-semibold text-green-700">
+                                                                            ₹{Number((w.valueAtWithdrawal - w.amount).toFixed(2)).toLocaleString("en-IN")}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>) 
+                    }
 
 
 
@@ -566,6 +737,7 @@ export const ClientDetails = () => {
             {editInterestForm && <EditInterestForm setEditInterestForm={setEditInterestForm} interest={interest} />}
             {withdrawForm && investmentType === "fd" && <FDWithdraw setWithdrawForm={setWithdrawForm} client={client} />}
             {withdrawForm && investmentType === "mf" && <MFWithdraw setWithdrawForm={setWithdrawForm} client={client} />}
+            {withdrawForm && investmentType === "smeipo" && <SMEIPOWithdraw setWithdrawForm={setWithdrawForm} client={client} />}
             <Footer />
         </div>
     );

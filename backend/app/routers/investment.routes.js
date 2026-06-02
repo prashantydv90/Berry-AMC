@@ -1,11 +1,12 @@
 import express from "express"
-import { addFDInvestment, addMFInvestment, deleteFDInvestment, deleteMFInvestment, editFDInvestment, editMFInvestment, resetMFInvestment } from "../controllers/addInvestment.controller.js";
+import { addFDInvestment, addMFInvestment, addSMEIPOInvestment, deleteFDInvestment, deleteMFInvestment, editFDInvestment, editMFInvestment, resetMFInvestment } from "../controllers/addInvestment.controller.js";
 import { isAdmin, isAuthenticated } from "../middlewares/isAuthenticated.js";
 
 const investmentRouter=express.Router();
 
 investmentRouter.route('/addinvestment/mf').post(isAuthenticated, isAdmin,addMFInvestment);
 investmentRouter.route('/addinvestment/fd').post(isAuthenticated, isAdmin,addFDInvestment);
+investmentRouter.route('/addinvestment/smeipo').post(isAuthenticated, isAdmin,addSMEIPOInvestment);
 investmentRouter.route('/editinvestment/mf/:id').put(isAuthenticated, isAdmin,editMFInvestment);
 investmentRouter.route('/editinvestment/fd/:id').put(isAuthenticated, isAdmin,editFDInvestment);
 investmentRouter.route('/deleteinvestment/mf/:investmentId').delete(isAuthenticated, isAdmin,deleteMFInvestment);
