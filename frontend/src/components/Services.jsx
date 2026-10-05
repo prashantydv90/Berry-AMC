@@ -92,7 +92,7 @@ const benefitsData = [
     details: [
       {
         term: "Premium Subscriptions",
-        desc: "If you invest ₹30k+, Netflix, Prime Video, and Hotstar Premium ID will be given for free.",
+        desc: "If you invest ₹100k+, Netflix and Prime Video Premium ID will be given for free.",
       },
       {
         term: "Credit Card Access",
