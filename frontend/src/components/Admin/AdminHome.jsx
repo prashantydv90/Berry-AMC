@@ -55,6 +55,38 @@ export const AdminHome = () => {
       client.PAN?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  
+  const handleRemoveClient = async (client) => {
+    const confirmed = window.confirm(
+      `Permanently delete ${client.name} and all their investments and withdrawal records? This cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const res = await axios.delete(
+        `https://berry-amc-0kaq.onrender.com/api/deleteClient/${client._id}`,
+        { withCredentials: true }
+      );
+
+      if (res.data.success) {
+        setClients((prev) =>
+          prev.filter((item) => item._id !== client._id)
+        );
+
+        alert(res.data.message);
+      }
+    } catch (error) {
+      console.error("Failed to delete client:", error);
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to delete client. Please try again."
+      );
+    }
+  };
+
+
   if (error) return <p className="text-red-500">Error: {error}</p>;
 
   return (
@@ -143,7 +175,8 @@ export const AdminHome = () => {
                   >
                     View
                   </div>
-                  <div className="px-3 py-1.5 text-[14px] rounded-md cursor-pointer hover:bg-red-700 bg-red-600 text-white">
+                  <div className="px-3 py-1.5 text-[14px] rounded-md cursor-pointer hover:bg-red-700 bg-red-600 text-white"
+                  onClick={() => handleRemoveClient(client)}>
                     Remove
                   </div>
                 </div>

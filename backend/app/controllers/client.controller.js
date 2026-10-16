@@ -1,6 +1,10 @@
+import mongoose from "mongoose";
+import { AddInterest } from "../models/addInterest.model.js";
 import { Client } from "../models/client.model.js";
 import { FDInvestment } from "../models/fdInvestment.model.js";
+import { FDWithdraw } from "../models/fdwithdraw.model.js";
 import { MFInvestment } from "../models/mfInvestment.model.js";
+import { smeipo } from "../models/smeipo.model.js";
 import { smeipoWithdraw } from "../models/smeipo.withdraw.model.js";
 import { User } from "../models/user.model.js";
 import { clientApprovalEmail } from "../utils/emailTemplate.js";
@@ -136,5 +140,122 @@ export const get1ClientDetails = async (req, res) => {
       message: "Error fetching client details",
       error: error.message,
     });
+  }
+};
+
+
+
+export const deleteClient = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.isValidObjectId(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid client ID",
+    });
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    let deletedSummary = null;
+
+    await session.withTransaction(async () => {
+      const client = await Client.findById(id).session(session);
+
+      if (!client) {
+        const error = new Error("Client not found");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // 1. Find all investment records owned by this client.
+      const [fds, mfs, smeipos] = await Promise.all([
+        FDInvestment.find({ client: id }).select("_id").session(session),
+        MFInvestment.find({ client: id }).select("_id").session(session),
+        smeipo.find({ client: id }).select("_id").session(session),
+      ]);
+
+      const fdIds = fds.map((fd) => fd._id);
+      const mfIds = mfs.map((mf) => mf._id);
+      const smeipoIds = smeipos.map((ipo) => ipo._id);
+
+      // 2. Delete FD withdrawal history.
+      const fdWithdrawals = await FDWithdraw.deleteMany(
+        { fd: { $in: fdIds } },
+        { session }
+      );
+
+      // 3. Delete SME IPO withdrawal history.
+      const smeipoWithdrawals = await smeipoWithdraw.deleteMany(
+        { ipo: { $in: smeipoIds } },
+        { session }
+      );
+
+      // 4. Delete periodic interest records belonging to this client.
+      const interests = await AddInterest.deleteMany(
+        { client: id },
+        { session }
+      );
+
+      // 5. Delete investment records.
+      const deletedFDs = await FDInvestment.deleteMany(
+        { client: id },
+        { session }
+      );
+
+      const deletedMFs = await MFInvestment.deleteMany(
+        { client: id },
+        { session }
+      );
+
+      const deletedSMEIPOs = await smeipo.deleteMany(
+        { client: id },
+        { session }
+      );
+
+      // 6. Remove the client reference from any associated user account.
+      // This preserves the login account but prevents a dangling clientId.
+      await User.updateMany(
+        { clientId: client._id },
+        { $unset: { clientId: "" } },
+        { session }
+      );
+
+      // 7. Delete the client only after its dependent records are removed.
+      await Client.deleteOne({ _id: client._id }, { session });
+
+      deletedSummary = {
+        client: 1,
+        fdInvestments: deletedFDs.deletedCount,
+        fdWithdrawals: fdWithdrawals.deletedCount,
+        mfInvestments: deletedMFs.deletedCount,
+        smeipoInvestments: deletedSMEIPOs.deletedCount,
+        smeipoWithdrawals: smeipoWithdrawals.deletedCount,
+        periodicInterests: interests.deletedCount,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Client and associated records deleted successfully",
+      deleted: deletedSummary,
+    });
+  } catch (error) {
+    console.error("Error deleting client:", error);
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message:
+        error.statusCode === 404
+          ? error.message
+          : "Failed to delete client and associated records",
+      error:
+        error.statusCode === 404
+          ? undefined
+          : error.message,
+    });
+  } finally {
+    await session.endSession();
   }
 };

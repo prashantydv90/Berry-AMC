@@ -22,7 +22,7 @@ export const AddClientForm = ({ setShowClient }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post("http://localhost:5000/api/clients", formData,{withCredentials:true});
+            const res = await axios.post("https://berry-amc-0kaq.onrender.com/api/clients", formData,{withCredentials:true});
             toast.success(res.data.message);
             setFormData({ name: "", phone: "", email: "", address: "", PAN: "" });
         } catch (error) {
